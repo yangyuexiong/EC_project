@@ -16,7 +16,7 @@ from ExtendRegister.db_register import db
 
 from app.models.admin.models import Admin, Role, Permission
 from app.models.product.models import ProductBrand, ProductCategory, Product, Sku, AttributeKey, AttributeVal, \
-    ProductComment, ProductStock, ProductSales
+    ProductComment, ProductStock, ProductSales, ProductOperationLog
 
 app = create_app()  # 实例
 manager = Manager(app)  # 绑定

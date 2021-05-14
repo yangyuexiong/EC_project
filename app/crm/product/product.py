@@ -16,7 +16,41 @@ class ProductCrmApi(Resource):
     """
 
     def get(self):
-        return api_result(code=200, message='商品')
+        """调试"""
+        from sqlalchemy import or_
+        # print(Product.__dict__.items())
+        q = 'iphoneokc'
+        page = 1
+        size = 20
+        l = ['name', 'summary']
+        like_list = []
+
+        other = {
+            # "name": "iphoneokc"
+        }
+
+        where_list = []
+        if other:
+            for k, v in other.items():
+                if hasattr(Product, k):
+                    where_list.append(getattr(Product, k) == v)
+
+        for k, v in Product.__dict__.items():
+            if k in l:
+                print(k, type(k), '======', v, type(v))
+                like_list.append(v.ilike(q if q is not None else ''))  # 模糊条件
+
+        pagination = Product.query.filter(or_(*like_list), *where_list).order_by(Product.create_time.desc()).paginate(
+            page=int(page),
+            per_page=int(size),
+            error_out=False
+        )
+        result_list = []
+        for i in pagination.items:
+            print(i.price, type(i.price))
+            obj = i.to_json()
+            result_list.append(obj)
+        return api_result(code=200, message='商品', data=result_list)
 
     def post(self):
         data = request.get_json()
@@ -31,8 +65,15 @@ class ProductCrmApi(Resource):
         video = data.get('video')
         carousel = data.get('carousel')
         image_link_dict = data.get('image_link_dict')
+        remark = data.get('remark')
         prod_stock = data.get('stock')
         sku_list = data.get('sku_list')
+
+        from app.models.admin.models import Admin
+        g.app_user = Admin.query.get(1)
+        create_user_id = g.app_user.id
+        create_username = g.app_user.username
+
         new_prod = Product(
             prod_category_id=prod_category,
             name=name,
@@ -45,7 +86,10 @@ class ProductCrmApi(Resource):
             cover_picture=cover_picture,
             video=video,
             carousel=carousel,
-            image_link_dict=image_link_dict
+            image_link_dict=image_link_dict,
+            create_user_id=create_user_id,
+            create_username=create_username,
+            remark=remark
         )
         db.session.add(new_prod)
         db.session.commit()
