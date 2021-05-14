@@ -54,22 +54,6 @@ def gen_order_number():
     return order_no
 
 
-class GeneralPagingFuzzyQuery:
-    """通用分页模糊查询"""
-
-    @classmethod
-    def __where(cls):
-        """1"""
-
-    @classmethod
-    def __like(cls):
-        """1"""
-
-    @classmethod
-    def general_pagination(cls):
-        """1"""
-
-
 def general_paging_fuzzy_query(q, model, like_params, where_dict, page=1, size=20):
     """
     通用分页模糊查询
