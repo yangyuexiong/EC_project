@@ -6,9 +6,11 @@
 # @Software: PyCharm
 
 import json
+import time
 from datetime import datetime
 
 from flask import request
+from sqlalchemy import or_
 
 
 def print_logs():
@@ -44,3 +46,62 @@ def json_format(d):
         print(json.dumps(d, sort_keys=True, indent=4, separators=(', ', ': '), ensure_ascii=False))
     except BaseException as e:
         print(d)
+
+
+def gen_order_number():
+    """生成订单号"""
+    order_no = str(time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))) + str(time.time()).replace('.', '')
+    return order_no
+
+
+class GeneralPagingFuzzyQuery:
+    """通用分页模糊查询"""
+
+    @classmethod
+    def __where(cls):
+        """1"""
+
+    @classmethod
+    def __like(cls):
+        """1"""
+
+    @classmethod
+    def general_pagination(cls):
+        """1"""
+
+
+def general_paging_fuzzy_query(q, model, like_params, where_dict, page=1, size=20):
+    """
+    通用分页模糊查询
+    :param q: 搜索内容
+    :param model: 模型
+    :param like_params: 模糊查询字段
+    :param where_dict: 条件
+    :param page: 页码
+    :param size: 条数
+    :return:
+    """
+    print(q, model, like_params, where_dict)
+    where_list = []
+    if where_dict:
+        for k, v in where_dict.items():
+            if hasattr(model, k):
+                where_list.append(getattr(model, k) == v)
+
+    like_list = []
+    for k, v in model.__dict__.items():
+        if k in like_params:
+            # print(k, type(k), '======', v, type(v))
+            like_list.append(v.ilike(q if q is not None else ''))  # 模糊条件
+    pagination = model.query.filter(or_(*like_list), *where_list).order_by(model.create_time.desc()).paginate(
+        page=int(page),
+        per_page=int(size),
+        error_out=False
+    )
+    # result_list = []
+    # for i in pagination.items:
+    #     obj = i.to_json()
+    #     result_list.append(obj)
+
+    result_list = [i.to_json() for i in pagination.items]
+    return result_list

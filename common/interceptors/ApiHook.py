@@ -5,7 +5,7 @@
 # @File    : ApiHook.py
 # @Software: PyCharm
 
-from flask import request
+from flask import request, g
 
 from app import api_bp
 from common.libs.tools import print_logs
@@ -17,4 +17,5 @@ def before_request_api():
     print_logs()
     if '/api' in request.path:
         print('访问api')
+        g.app_user = None
         return

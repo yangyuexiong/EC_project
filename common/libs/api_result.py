@@ -17,9 +17,9 @@ def api_result(code=None, message=None, data=None, details=None, status=None):
         "data": data,
     }
 
-    if not result['data']:
-        result.pop('data')
-        return jsonify(result)
+    # if not result['data']:
+    #     result.pop('data')
+    #     return jsonify(result)
     return jsonify(result)
 
 

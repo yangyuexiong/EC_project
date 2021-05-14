@@ -10,7 +10,7 @@ import threading
 
 from flask_restful import Resource
 from flask.views import MethodView
-from flask import abort, render_template, request
+from flask import abort, render_template, request, g
 
 from common.libs.api_result import api_result
 from common.libs.customException import ab_code, ab_code_2

@@ -20,6 +20,10 @@ class ProductBrand(BaseModel):
     sort = db.Column(db.Integer, nullable=True, comment='排序')
     icon = db.Column(db.String(255), nullable=True, comment='图标')
     keywords = db.Column(db.String(255), nullable=True, comment='关键字')
+    create_user_id = db.Column(db.String(32), nullable=True, comment='创建人id')
+    create_username = db.Column(db.String(32), nullable=True, comment='创建人')
+    update_user_id = db.Column(db.String(32), nullable=True, comment='更新人id')
+    update_username = db.Column(db.String(32), nullable=True, comment='更新人')
     remark = db.Column(db.String(255), nullable=True, comment='备注')
 
     def __repr__(self):
@@ -37,6 +41,10 @@ class ProductCategory(BaseModel):
     sort = db.Column(db.Integer, nullable=True, comment='排序')
     icon = db.Column(db.String(255), nullable=True, comment='图标')
     keywords = db.Column(db.String(255), nullable=True, comment='关键字')
+    create_user_id = db.Column(db.String(32), nullable=True, comment='创建人id')
+    create_username = db.Column(db.String(32), nullable=True, comment='创建人')
+    update_user_id = db.Column(db.String(32), nullable=True, comment='更新人id')
+    update_username = db.Column(db.String(32), nullable=True, comment='更新人')
     remark = db.Column(db.String(255), nullable=True, comment='备注')
 
     def __repr__(self):
@@ -50,9 +58,9 @@ class Product(BaseModel):
     name = db.Column(db.String(64), nullable=False, comment='商品名称')
     subtitle = db.Column(db.String(64), nullable=True, comment='副标题')
     summary = db.Column(db.String(255), nullable=True, comment='商品简介')
-    price = db.Column(db.DECIMAL, nullable=True, default=0, comment='销售价')
-    cost_price = db.Column(db.DECIMAL, nullable=True, default=0, comment='成本价')
-    sale_price = db.Column(db.DECIMAL, nullable=True, default=0, comment='促销价')
+    price = db.Column(db.DECIMAL(10, 2), nullable=True, default=0, comment='销售价')
+    cost_price = db.Column(db.DECIMAL(10, 2), nullable=True, default=0, comment='成本价')
+    sale_price = db.Column(db.DECIMAL(10, 2), nullable=True, default=0, comment='促销价')
     sale_status = db.Column(db.String(16), default='1', comment='销售状态:1-正常;2-推荐;3-热销')
     prod_status = db.Column(db.String(16), default='1', comment='商品状态:1-已上架;2-已下架;3-待审核;4-待上架;5-审核不通过;')
     cover_picture = db.Column(db.String(255), nullable=True, comment='封面图片')
@@ -60,6 +68,10 @@ class Product(BaseModel):
     carousel = db.Column(db.JSON, nullable=True, comment='轮播图')
     image_link_dict = db.Column(db.JSON, nullable=True, comment='图片')
     attr_json = db.Column(db.JSON, nullable=True, comment='attr json')
+    create_user_id = db.Column(db.String(32), nullable=True, comment='创建人id')
+    create_username = db.Column(db.String(32), nullable=True, comment='创建人')
+    update_user_id = db.Column(db.String(32), nullable=True, comment='更新人id')
+    update_username = db.Column(db.String(32), nullable=True, comment='更新人')
     remark = db.Column(db.String(255), nullable=True, comment='备注')
 
     def __repr__(self):
@@ -72,6 +84,10 @@ class AttributeKey(BaseModel):
     prod_category_id = db.Column(db.String(64), nullable=True, comment='商品类目id')
     product_id = db.Column(db.String(64), nullable=True, comment='商品id')
     name = db.Column(db.String(64), nullable=True, comment='属性名称')
+    create_user_id = db.Column(db.String(32), nullable=True, comment='创建人id')
+    create_username = db.Column(db.String(32), nullable=True, comment='创建人')
+    update_user_id = db.Column(db.String(32), nullable=True, comment='更新人id')
+    update_username = db.Column(db.String(32), nullable=True, comment='更新人')
     remark = db.Column(db.String(255), nullable=True, comment='备注')
 
     def __repr__(self):
@@ -83,6 +99,10 @@ class AttributeVal(BaseModel):
     __table_args__ = {'comment': '属性值'}
     attr_key_id = db.Column(db.String(64), nullable=True, comment='属性名key_id')
     name = db.Column(db.String(64), nullable=True, comment='属性值名称')
+    create_user_id = db.Column(db.String(32), nullable=True, comment='创建人id')
+    create_username = db.Column(db.String(32), nullable=True, comment='创建人')
+    update_user_id = db.Column(db.String(32), nullable=True, comment='更新人id')
+    update_username = db.Column(db.String(32), nullable=True, comment='更新人')
     remark = db.Column(db.String(255), nullable=True, comment='备注')
 
     def __repr__(self):
@@ -95,9 +115,9 @@ class Sku(BaseModel):
     product_id = db.Column(db.String(64), nullable=True, comment='商品id')
     icon = db.Column(db.String(64), nullable=True, comment='icon')
     spec = db.Column(db.JSON, nullable=True, comment='商品规格Json')
-    price = db.Column(db.DECIMAL, nullable=True, default=0, comment='销售价')
-    cost_price = db.Column(db.DECIMAL, nullable=True, default=0, comment='成本价')
-    sale_price = db.Column(db.DECIMAL, nullable=True, default=0, comment='促销价')
+    price = db.Column(db.DECIMAL(10, 2), nullable=True, default=0, comment='销售价')
+    cost_price = db.Column(db.DECIMAL(10, 2), nullable=True, default=0, comment='成本价')
+    sale_price = db.Column(db.DECIMAL(10, 2), nullable=True, default=0, comment='促销价')
     remark = db.Column(db.String(255), nullable=True, comment='备注')
 
     def __repr__(self):
@@ -145,4 +165,21 @@ class ProductSales(BaseModel):
     def __repr__(self):
         return 'ProductStock 模型对象-> ID:{} 商品id:{} sku_id:{} 销量:{}'.format(
             self.id, self.product_id, self.sku_id, self.sales
+        )
+
+
+class ProductOperationLog(BaseModel):
+    __tablename__ = 'ec_prod_operation_log'
+    __table_args__ = {'comment': '商品操作记录'}
+    product_id = db.Column(db.String(64), nullable=True, comment='商品id')
+    op_user_id = db.Column(db.String(32), nullable=True, comment='操作人id')
+    op_username = db.Column(db.String(32), nullable=True, comment='操作人名称')
+    op_type = db.Column(db.String(16), nullable=True, comment='操作类型:1-新增;2-删除;3-修改')
+    field = db.Column(db.String(128), nullable=True, comment='操作字段名称')
+    before_val = db.Column(db.String(32), nullable=True, comment='修改前的值')
+    after_val = db.Column(db.String(32), nullable=True, comment='修改后的值')
+
+    def __repr__(self):
+        return 'ProductOperationLog 模型对象-> ID:{} 商品id:{} 用户id:{} 用户名称:{}'.format(
+            self.id, self.product_id, self.user_id, self.username
         )
