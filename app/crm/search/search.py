@@ -16,6 +16,10 @@ classify_dict = {
     "1": "",  # 用户
     "2": "",  # 订单
     "3": Product,  # 商品
+    "4": Sku,  # Sku
+    "5": AttributeKey,  # 属性key
+    "6": AttributeVal,  # 属性值
+    "7": ProductStock,  # 库存
 }
 
 
