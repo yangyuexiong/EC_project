@@ -121,8 +121,8 @@ class Sku(BaseModel):
     remark = db.Column(db.String(255), nullable=True, comment='备注')
 
     def __repr__(self):
-        return 'Sku 模型对象-> ID:{} 商品规格:{} 库存:{} 金额:{}'.format(
-            self.id, self.commodity_spec, self.stock, self.price
+        return 'Sku 模型对象-> ID:{} 商品规格:{} 金额:{}'.format(
+            self.id, self.spec, self.price
         )
 
 

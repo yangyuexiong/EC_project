@@ -14,8 +14,7 @@ from .crm.search.search import SearchApi
 from .crm.index.index import IndexCrmApi
 from .crm.login.login import LoginCrmApi
 from .crm.product.product import ProductCrmApi
-from .crm.sku.sku import SkuApi
-
+from .crm.sku.sku import SkuApi, SkuPageApi
 
 """front"""
 api_bp = Blueprint('api', __name__)
@@ -30,3 +29,4 @@ crm_api.add_resource(SearchApi, '/search', endpoint='crm_search')
 crm_api.add_resource(LoginCrmApi, '/login', endpoint='crm_login')
 crm_api.add_resource(ProductCrmApi, '/product', endpoint='crm_product')
 crm_api.add_resource(SkuApi, '/sku', endpoint='crm_sku')
+crm_api.add_resource(SkuPageApi, '/sku/page', endpoint='crm_sku_page')

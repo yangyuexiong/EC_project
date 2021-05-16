@@ -104,12 +104,17 @@ class NewConfig(BaseConfig):
     RUN_PORT = conf.getint('base', 'RUN_PORT')
 
     # mysql
+    MYSQL_USERNAME = conf.get('mysql', 'USERNAME')
+    MYSQL_PASSWORD = conf.get('mysql', 'PASSWORD')
+    MYSQL_HOSTNAME = conf.get('mysql', 'HOSTNAME')
+    MYSQL_PORT = conf.getint('mysql', 'PORT')
+    MYSQL_DATABASE = conf.get('mysql', 'DATABASE')
     DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8'.format(
-        conf.get('mysql', 'USERNAME'),
-        conf.get('mysql', 'PASSWORD'),
-        conf.get('mysql', 'HOSTNAME'),
-        conf.getint('mysql', 'PORT'),
-        conf.get('mysql', 'DATABASE')
+        MYSQL_USERNAME,
+        MYSQL_PASSWORD,
+        MYSQL_HOSTNAME,
+        MYSQL_PORT,
+        MYSQL_DATABASE
     )
     SQLALCHEMY_DATABASE_URI = DB_URI
     SQLALCHEMY_TRACK_MODIFICATIONS = True
