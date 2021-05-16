@@ -7,31 +7,25 @@
 
 
 from app.all_reference import *
-from app.models.product.models import Product, AttributeKey, AttributeVal, Sku, ProductStock
+from app.models.product.models import Product, AttributeKey, AttributeVal, Sku
 
 
 class SkuApi(Resource):
     """
-    sku
+    sku api
+    GET: sku详情
+    POST: sku新增
+    PUT: sku编辑
+    DELETE: sku删除
     """
 
-    def get(self):
+    def get(self, sku_id=None):
 
-        # q = Sku.query.join(Product, Sku.product_id == Product.id).order_by(Sku.create_time.desc())
-        from sqlalchemy import or_
-        q = ""
-        like_list = [Product.name.ilike(q if q else ''), Product.summary.ilike(q if q else '')]
-        q = db.session.query(Sku, Product).join(Product, Sku.product_id == Product.id).filter(
-            or_(*like_list))
-        for i in q.all():
-            print(i)
-            print(type(i[0]), type(i[1]))
-            print(i[0].to_json())
-            print(i[1].to_json())
-            print('\n')
-            # print(i.to_json())
-            # print(i.to_json())
-        return api_result(code=200, message='操作成功', data=[])
+        sku_obj = Sku.query.get(sku_id)
+        if sku_obj:
+            return api_result(code=200, message='操作成功', data=sku_obj.to_json())
+        else:
+            ab_code_2(1000001)
 
     def post(self):
         data = request.get_json()
@@ -54,7 +48,7 @@ class SkuApi(Resource):
                     db.session.commit()
                 else:
                     ab_code_2(1000001)
-            return api_result(code=200, message='操作成功', data=data)
+            return api_result(code=201, message='操作成功', data=data)
         else:
             ab_code_2(1000001)
 
@@ -87,18 +81,24 @@ class SkuApi(Resource):
             else:
                 ab_code_2(1000001)
 
-            return api_result(code=200, message='操作成功', data=data)
+            return api_result(code=203, message='操作成功', data=data)
+        else:
+            ab_code_2(1000001)
+
+    def delete(self, sku_id=None):
+        sku_obj = Sku.query.get(sku_id)
+        if sku_obj:
+            sku_obj.status = 2
+            db.session.commit()
+            return api_result(code=204, message='操作成功', data=[])
         else:
             ab_code_2(1000001)
 
 
-def create_query():
-    pass
-
-
 class SkuPageApi(Resource):
     """
-    sku page
+    sku page api
+    POST: sku分页模糊查询
     """
 
     def post(self):
@@ -112,7 +112,7 @@ class SkuPageApi(Resource):
         min_sale_price = data.get('min_sale_price')
         page, size = page_size(**data)
 
-        # Todo
+        # Todo 补充商品名称字段的查询
         sql = """
         SELECT
         -- *,
@@ -136,7 +136,7 @@ class SkuPageApi(Resource):
             Sku.remark.ilike("%{}%".format(q if q else '')),
         ]
         where_list = [
-            # Sku.remark == 'yyx'
+            Sku.status == 1
         ]
         where_list.append(
             Sku.price.between(max_price, min_price)) if max_price and min_price else None
