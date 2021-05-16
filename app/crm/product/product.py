@@ -7,50 +7,21 @@
 
 
 from app.all_reference import *
-from app.models.product.models import Product, AttributeKey, AttributeVal, Sku, ProductStock
+from app.models.product.models import Product, Sku, ProductStock
 
 
+# Todo 商品详情,商品编辑
 class ProductCrmApi(Resource):
     """
     商品
+    GET: 商品详情
+    POST: 商品新增
+    PUT: 商品编辑
+    DELETE: 商品逻辑删除
     """
 
     def get(self):
-        """调试"""
-        from sqlalchemy import or_
-        # print(Product.__dict__.items())
-        q = 'iphoneokc'
-        page = 1
-        size = 20
-        l = ['name', 'summary']
-        like_list = []
-
-        other = {
-            # "name": "iphoneokc"
-        }
-
-        where_list = []
-        if other:
-            for k, v in other.items():
-                if hasattr(Product, k):
-                    where_list.append(getattr(Product, k) == v)
-
-        for k, v in Product.__dict__.items():
-            if k in l:
-                print(k, type(k), '======', v, type(v))
-                like_list.append(v.ilike(q if q is not None else ''))  # 模糊条件
-
-        pagination = Product.query.filter(or_(*like_list), *where_list).order_by(Product.create_time.desc()).paginate(
-            page=int(page),
-            per_page=int(size),
-            error_out=False
-        )
-        result_list = []
-        for i in pagination.items:
-            print(i.price, type(i.price))
-            obj = i.to_json()
-            result_list.append(obj)
-        return api_result(code=200, message='商品', data=result_list)
+        return api_result(code=200, message='操作成功', data=[])
 
     def post(self):
         data = request.get_json()
@@ -121,10 +92,11 @@ class ProductCrmApi(Resource):
             ps = ProductStock(product_id=product_id, stock=prod_stock)
             db.session.add(ps)
             db.session.commit()
-        return api_result(code=201, message='商品新增成功', data=data)
+        return api_result(code=201, message='操作成功', data=data)
 
     def put(self):
-        return
+        data = request.get_json()
+        return api_result(code=203, message='操作成功', data=[])
 
     def delete(self):
         data = request.get_json()
@@ -134,6 +106,6 @@ class ProductCrmApi(Resource):
         if prod and prod_status in [1, 2, 3, 4, 5]:
             prod.prod_status = prod_status
             db.session.commit()
-            return api_result(code=204, message='操作成功')
+            return api_result(code=204, message='操作成功', data=[])
         else:
-            ab_code_2(700001)
+            ab_code_2(1000001)

@@ -20,7 +20,6 @@ class SkuApi(Resource):
     """
 
     def get(self, sku_id=None):
-
         sku_obj = Sku.query.get(sku_id)
         if sku_obj:
             return api_result(code=200, message='操作成功', data=sku_obj.to_json())
