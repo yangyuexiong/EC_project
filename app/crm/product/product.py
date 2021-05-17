@@ -10,7 +10,7 @@ from app.all_reference import *
 from app.models.product.models import Product, Sku, ProductStock
 
 
-# Todo 商品详情,商品编辑
+# Todo 商品编辑
 class ProductCrmApi(Resource):
     """
     商品
@@ -20,8 +20,18 @@ class ProductCrmApi(Resource):
     DELETE: 商品逻辑删除
     """
 
-    def get(self):
-        return api_result(code=200, message='操作成功', data=[])
+    def get(self, product_id=None):
+        prod_obj = Product.query.get(product_id)
+        if prod_obj:
+            prod = prod_obj.to_json()
+            sku_list = Sku.query.filter_by(product_id=product_id).all()
+            if sku_list:
+                prod['sku_list'] = [s.to_json() for s in sku_list]
+            else:
+                prod['sku_list'] = []
+            return api_result(code=200, message='操作成功', data=prod)
+        else:
+            ab_code_2(1000001)
 
     def post(self):
         data = request.get_json()
