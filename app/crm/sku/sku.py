@@ -125,7 +125,13 @@ class SkuPageApi(Resource):
         sku.update_time,
         sku.remark
         FROM ec_sku as sku LEFT JOIN ec_product as pro ON sku.product_id=pro.id 
-        WHERE (pro.name LIKE"%iphone%" or sku.spec LIKE"%iphone%") 
+        WHERE (
+        pro.id LIKE"%iphone%" 
+        or pro.name LIKE"%iphone%" 
+        or sku.id LIKE"%iphone%" 
+        or sku.spec LIKE"%iphone%" 
+        or sku.remark LIKE"%iphone%"
+        ) 
         and sku.status=1
         and (sku.price BETWEEN 10 and 40) 
         and (sku.price BETWEEN 10 and 40) 
@@ -135,7 +141,10 @@ class SkuPageApi(Resource):
         """
 
         like_list = [
+            Sku.id.ilike("%{}%".format(q if q else '')),
+            Sku.spec.ilike("%{}%".format(q if q else '')),
             Sku.remark.ilike("%{}%".format(q if q else '')),
+            Product.id.ilike("%{}%".format(q if q else '')),
             Product.name.ilike("%{}%".format(q if q else ''))
         ]
         where_list = [
