@@ -111,10 +111,8 @@ class SkuPageApi(Resource):
         min_sale_price = data.get('min_sale_price')
         page, size = page_size(**data)
 
-        # Todo 补充商品名称字段的查询
-        sql = """
+        sql_demo = """
         SELECT
-        -- *,
         pro.id,
         pro.name,
         sku.id,
@@ -127,12 +125,18 @@ class SkuPageApi(Resource):
         sku.update_time,
         sku.remark
         FROM ec_sku as sku LEFT JOIN ec_product as pro ON sku.product_id=pro.id 
-        WHERE (pro.name LIKE"%{}%" or sku.spec LIKE"%{}%") 
-        ORDER BY sku.create_timestamp LIMIT {},{};
-        """.format(q, q, page, size)
+        WHERE (pro.name LIKE"%iphone%" or sku.spec LIKE"%iphone%") 
+        and sku.status=1
+        and (sku.price BETWEEN 10 and 40) 
+        and (sku.price BETWEEN 10 and 40) 
+        and (sku.cost_price BETWEEN 1 and 2) 
+        and (sku.sale_price BETWEEN 100 and 200)
+        ORDER BY sku.create_timestamp LIMIT 0,20;
+        """
 
         like_list = [
             Sku.remark.ilike("%{}%".format(q if q else '')),
+            Product.name.ilike("%{}%".format(q if q else ''))
         ]
         where_list = [
             Sku.status == 1
@@ -144,7 +148,28 @@ class SkuPageApi(Resource):
         where_list.append(
             Sku.sale_price.between(max_sale_price, min_sale_price)) if max_sale_price and min_sale_price else None
 
-        result = Sku.query.filter(or_(*like_list), *where_list).order_by(Sku.create_time.desc())
-        pagination = result.paginate(page=int(page), per_page=int(size), error_out=False)
-        result_list = [r.to_json() for r in pagination.items]
+        result = Sku.query.join(
+            Product,
+            Sku.product_id == Product.id
+        ).filter(
+            or_(*like_list),
+            *where_list
+        ).with_entities(
+            Sku, Product
+        ).order_by(
+            Sku.create_time.desc()
+        ).paginate(
+            page=int(page),
+            per_page=int(size),
+            error_out=False
+        )
+
+        result_list = []
+        for res in result.items:
+            print(res)
+            sku_json = res[0].to_json()
+            product_json = res[1].to_json()
+            sku_json['product_json'] = product_json
+            result_list.append(sku_json)
+
         return api_result(code=200, message='操作成功', data=result_list)
