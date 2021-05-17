@@ -117,47 +117,6 @@ def page_size(page=None, size=None, **kwargs):
     return page, size
 
 
-class GeneralPagingFuzzyQuery:
-    """
-    :param q: 搜索内容
-    :param model: 模型
-    :param like_params: 模糊查询字段
-    :param where_dict: 条件
-    :param page: 页码
-    :param size: 条数
-    :param kwargs: 扩展参数
-    """
-
-    def __init__(self, q=None, model=None, like_params=None, where_dict=None, page=None, size=None, **kwargs):
-        self.q = q
-        self.model = model
-        if not isinstance(self.model, DefaultMeta):
-            raise TypeError('model -> class DefaultMeta')
-        self.like_params = like_params if like_params else []
-        self.where_dict = where_dict if where_dict else {}
-        self.page = page if page else 1
-        self.size = size if size else 20
-        self.kwargs = kwargs
-
-    def gen_like_list(self):
-        """生成like集"""
-        like_list = []
-        for k, v in self.model.__dict__.items():
-            if k in self.like_params:
-                # print(k, type(k), '======', v, type(v))
-                like_list.append(v.ilike(self.q if self.q else ''))  # 模糊条件: v -> Model.Column.ilike
-        return like_list
-
-    def gen_where_list(self):
-        """生成where集"""
-        where_list = []
-        if self.where_dict:
-            for k, v in self.where_dict.items():
-                if hasattr(self.model, k):
-                    where_list.append(getattr(self.model, k) == v)
-        return where_list
-
-
 class MyPyMysql:
     def __init__(self, host=None, port=None, user=None, password=None, db=None, debug=None):
         self.host = host
