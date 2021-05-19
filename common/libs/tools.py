@@ -280,6 +280,15 @@ class MyPyMysql:
                         v = str(v)
                         v = float(v)
                         new_r[k] = v
+                    elif isinstance(v, str):
+                        try:
+                            new_v = json.loads(v)
+                            if isinstance(new_v, list) or isinstance(new_v, dict):
+                                new_r[k] = new_v
+                            else:
+                                new_r[k] = v
+                        except BaseException as e:
+                            new_r[k] = v
                     else:
                         new_r[k] = v
                 return new_r
