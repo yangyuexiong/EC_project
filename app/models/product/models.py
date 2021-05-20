@@ -61,7 +61,8 @@ class Product(BaseModel):
     cost_price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='成本价')
     sale_price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='促销价')
     sale_status = db.Column(TINYINT(3, unsigned=True), server_default=text('1'), comment='销售状态:1-正常;2-推荐;3-热销')
-    prod_status = db.Column(TINYINT(3, unsigned=True), server_default=text('1'), comment='商品状态:1-上架;2-下架;3-待审核;4-待上架;5-审核不通过;')
+    prod_status = db.Column(TINYINT(3, unsigned=True), server_default=text('1'),
+                            comment='商品状态:1-上架;2-下架;3-待审核;4-待上架;5-审核不通过;')
     cover_picture = db.Column(db.String(255), comment='封面图片')
     video = db.Column(db.String(255), comment='视频')
     carousel = db.Column(db.JSON, comment='轮播图')
@@ -80,7 +81,7 @@ class Product(BaseModel):
 class AttributeKey(BaseModel):
     __tablename__ = 'ec_attr_key'
     __table_args__ = {'comment': '属性名'}
-    prod_category_id = db.Column(BIGINT(20, unsigned=True), comment='商品类目id')
+    prod_category_id = db.Column(BIGINT(20, unsigned=True), server_default=text('0'), comment='商品类目id')
     product_id = db.Column(BIGINT(20, unsigned=True), comment='商品id')
     name = db.Column(db.String(64), nullable=False, comment='属性名称')
     creator = db.Column(db.String(32), comment='创建人')

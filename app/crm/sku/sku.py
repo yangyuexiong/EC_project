@@ -33,8 +33,8 @@ class SkuApi(Resource):
             for attr in attr_list:
                 attr_val = attr.get('attr_val', [])
                 if attr_val:
-                    prod_category_id = attr.get('category_id')
-                    product_id = attr.get('product_id')
+                    prod_category_id = attr.get('category_id', 0) if attr.get('category_id', 0) else 0
+                    product_id = attr.get('product_id') if attr.get('product_id') else 0
                     name = attr.get('attr_key')
                     remark = attr.get('remark')
                     ak = AttributeKey(
@@ -54,8 +54,8 @@ class SkuApi(Resource):
     def put(self):
         data = request.get_json()
         attr_key_id = int(data.get('attr_key_id', 0))
-        category_id = data.get('category_id')
-        product_id = data.get('product_id')
+        category_id = data.get('category_id') if data.get('category_id') else 0
+        product_id = data.get('product_id') if data.get('product_id') else 0
         attr_key = data.get('attr_key')
         attr_val_list = data.get('attr_val_list', [])
 
@@ -68,6 +68,7 @@ class SkuApi(Resource):
                 ak.prod_category_id = category_id
                 ak.product_id = product_id
                 ak.name = attr_key
+                # Todo 更新人
                 db.session.commit()
 
                 for _av in attr_val_list:
@@ -87,7 +88,7 @@ class SkuApi(Resource):
     def delete(self, sku_id=None):
         sku_obj = Sku.query.get(sku_id)
         if sku_obj:
-            sku_obj.status = 2
+            sku_obj.is_deleted = Sku.id
             db.session.commit()
             return api_result(code=204, message='操作成功', data=[])
         else:
@@ -132,7 +133,7 @@ class SkuPageApi(Resource):
         or sku.spec LIKE"%iphone%" 
         or sku.remark LIKE"%iphone%"
         ) 
-        and sku.status=1
+        and sku.is_deleted=0
         and (sku.price BETWEEN 10 and 40) 
         and (sku.price BETWEEN 10 and 40) 
         and (sku.cost_price BETWEEN 1 and 2) 
@@ -148,7 +149,7 @@ class SkuPageApi(Resource):
             Product.name.ilike("%{}%".format(q if q else ''))
         ]
         where_list = [
-            Sku.status == 1
+            Sku.is_deleted == 0
         ]
         where_list.append(
             Sku.price.between(max_price, min_price)) if max_price and min_price else None

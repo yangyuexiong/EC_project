@@ -52,8 +52,8 @@ class ProductCrmApi(Resource):
 
         from app.models.admin.models import Admin
         g.app_user = Admin.query.get(1)
-        create_user_id = g.app_user.id
-        create_username = g.app_user.username
+        creator_id = g.app_user.id
+        creator = g.app_user.username
 
         new_prod = Product(
             prod_category_id=prod_category,
@@ -68,8 +68,8 @@ class ProductCrmApi(Resource):
             video=video,
             carousel=carousel,
             image_link_dict=image_link_dict,
-            create_user_id=create_user_id,
-            create_username=create_username,
+            creator=creator,
+            creator_id=creator_id,
             remark=remark
         )
         db.session.add(new_prod)
