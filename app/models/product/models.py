@@ -58,10 +58,10 @@ class Product(BaseModel):
     subtitle = db.Column(db.String(64), comment='副标题')
     summary = db.Column(db.String(255), comment='商品简介')
     price = db.Column(db.DECIMAL(10, 2), default=0, comment='销售价')
-    cost_price = db.Column(db.DECIMAL(10, 2), server_default=9999, comment='成本价')
-    sale_price = db.Column(db.DECIMAL(10, 2), server_default=9999, comment='促销价')
-    sale_status = db.Column(TINYINT(3, unsigned=True), server_default=1, comment='销售状态:1-正常;2-推荐;3-热销')
-    prod_status = db.Column(TINYINT(3, unsigned=True), server_default=1, comment='商品状态:1-上架;2-下架;3-待审核;4-待上架;5-审核不通过;')
+    cost_price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='成本价')
+    sale_price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='促销价')
+    sale_status = db.Column(TINYINT(3, unsigned=True), server_default=text('1'), comment='销售状态:1-正常;2-推荐;3-热销')
+    prod_status = db.Column(TINYINT(3, unsigned=True), server_default=text('1'), comment='商品状态:1-上架;2-下架;3-待审核;4-待上架;5-审核不通过;')
     cover_picture = db.Column(db.String(255), comment='封面图片')
     video = db.Column(db.String(255), comment='视频')
     carousel = db.Column(db.JSON, comment='轮播图')
@@ -114,9 +114,9 @@ class Sku(BaseModel):
     product_id = db.Column(BIGINT(20, unsigned=True), nullable=False, comment='商品id')
     icon = db.Column(db.String(255), comment='icon')
     spec = db.Column(db.JSON, comment='商品规格Json')
-    price = db.Column(db.DECIMAL(10, 2), server_default=9999, comment='销售价')
-    cost_price = db.Column(db.DECIMAL(10, 2), server_default=9999, comment='成本价')
-    sale_price = db.Column(db.DECIMAL(10, 2), server_default=9999, comment='促销价')
+    price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='销售价')
+    cost_price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='成本价')
+    sale_price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='促销价')
     creator = db.Column(db.String(32), comment='创建人')
     creator_id = db.Column(BIGINT(20, unsigned=True), comment='创建人id')
     modifier = db.Column(db.String(32), comment='更新人')
@@ -166,7 +166,7 @@ class ProductSales(BaseModel):
     __tablename__ = 'ec_sales'
     __table_args__ = {'comment': '商品销量'}
     product_id = db.Column(BIGINT(20, unsigned=True), comment='商品id')
-    sku_id = db.Column(nullable=True, comment='sku-id')
+    sku_id = db.Column(BIGINT(20, unsigned=True), comment='sku-id')
     sales = db.Column(BIGINT(20, unsigned=True), comment='销量')
 
     def __repr__(self):
