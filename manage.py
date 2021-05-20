@@ -171,23 +171,11 @@ class SkuInit(Command):
         db.session.commit()
 
 
-class YYx(Command):
-    """YYx"""
-
-    def run(self):
-        pc = ProductCategory(name='手机')
-        db.session.add(pc)
-        db.session.commit()
-
-
 # 添加命令
 manager.add_command('hello', Hello())
 manager.add_command('orm', TableCreateFirst())
 manager.add_command('table', TableCreate())
 manager.add_command('crm', CRMInit())
-manager.add_command('cdy', CommodityInit())
-manager.add_command('sku', SkuInit())
-manager.add_command('yyx-test', YYx())
 
 
 @manager.option('-u', '--username', dest='username')
