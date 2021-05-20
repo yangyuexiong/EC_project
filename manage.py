@@ -14,7 +14,8 @@ from flask_migrate import Migrate, MigrateCommand
 from ApplicationExample import create_app
 from ExtendRegister.db_register import db
 
-from app.models.admin.models import Admin, Role, Permission
+# from app.models.admin.models_backup import Admin, Role, Permission
+from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, MidPermissionAndRole, CrmResource
 from app.models.product.models import ProductBrand, ProductCategory, Product, Sku, AttributeKey, AttributeVal, \
     ProductComment, ProductStock, ProductSales, ProductOperationLog
 
