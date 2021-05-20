@@ -113,7 +113,7 @@ class MidAdminAndRole(BaseModel):
 
 
 class MidPermissionAndRole(BaseModel):
-    __tablename__ = 'ec_crm_mid_admin_role'
+    __tablename__ = 'ec_crm_mid_permission_role'
     __table_args__ = {'comment': '权限角色中间表'}
     permission_id = db.Column(BIGINT(20, unsigned=True), comment='后台用户id')
     role_id = db.Column(BIGINT(20, unsigned=True), comment='后台用户id')
@@ -127,9 +127,25 @@ class MidPermissionAndRole(BaseModel):
         return 'MidPermissionAndRole 模型对象-> ID:{} 角色id:{} 权限id:{}'.format(self.id, self.role_id, self.permission_id)
 
 
-class CrmResource(BaseModel):
-    __tablename__ = 'ec_crm_resource'
-    __table_args__ = {'comment': 'Api/Route资源表'}
+class ApiResource(BaseModel):
+    __tablename__ = 'ec_crm_api_resource'
+    __table_args__ = {'comment': 'Api资源表'}
+    name = db.Column(db.String(64), nullable=False, comment='Api名称')
+    url = db.Column(db.String(128), comment='接口地址')
+    method = db.Column(db.String(128), comment='Https Method 1-GET;2-POST;3-PUT;4-DELETE;5-PATCH')
+    creator = db.Column(db.String(32), comment='创建人')
+    creator_id = db.Column(BIGINT(20, unsigned=True), comment='创建人id')
+    modifier = db.Column(db.String(32), comment='更新人')
+    modifier_id = db.Column(BIGINT(20, unsigned=True), comment='更新人id')
+    remark = db.Column(db.String(255), comment='备注')
+
+    def __repr__(self):
+        return 'ApiResource 模型对象-> ID:{} Api名称:{}'.format(self.id, self.name)
+
+
+class RouteResource(BaseModel):
+    __tablename__ = 'ec_crm_route_resource'
+    __table_args__ = {'comment': 'Route资源表'}
     name = db.Column(db.String(50), nullable=False, comment='资源名称')
     code = db.Column(db.String(64), comment='路由编码')
     component = db.Column(db.String(64), comment='组件名')
@@ -147,4 +163,4 @@ class CrmResource(BaseModel):
     remark = db.Column(db.String(255), comment='备注')
 
     def __repr__(self):
-        return 'CrmResource 模型对象-> ID:{}'.format(self.id)
+        return 'RouteResource 模型对象-> ID:{} Route名称:{}'.format(self.id, self.name)
