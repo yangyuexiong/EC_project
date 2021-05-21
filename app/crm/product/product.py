@@ -51,9 +51,6 @@ class ProductCrmApi(Resource):
         prod_stock = data.get('stock')
         sku_list = data.get('sku_list')
 
-        creator_id = g.app_user.id
-        creator = g.app_user.username
-
         new_prod = Product(
             prod_category_id=prod_category,
             name=name,
@@ -67,8 +64,8 @@ class ProductCrmApi(Resource):
             video=video,
             carousel=carousel,
             image_link_dict=image_link_dict,
-            creator=creator,
-            creator_id=creator_id,
+            creator=g.app_user.username,
+            creator_id=g.app_user.id,
             remark=remark
         )
         db.session.add(new_prod)
