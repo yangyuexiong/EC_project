@@ -11,6 +11,7 @@ from app.models.product.models import Product, Sku, ProductStock
 
 
 # Todo 商品编辑
+# Todo 操作日志
 class ProductCrmApi(Resource):
     """
     商品
@@ -50,8 +51,6 @@ class ProductCrmApi(Resource):
         prod_stock = data.get('stock')
         sku_list = data.get('sku_list')
 
-        from app.models.admin.models import Admin
-        g.app_user = Admin.query.get(1)
         creator_id = g.app_user.id
         creator = g.app_user.username
 
@@ -115,6 +114,8 @@ class ProductCrmApi(Resource):
         prod = Product.query.get(product_id)
         if prod and prod_status in [1, 2, 3, 4, 5]:
             prod.prod_status = prod_status
+            prod.modifier = g.app_user.username
+            prod.modifier_id = g.app_user.id
             db.session.commit()
             return api_result(code=204, message='操作成功', data=[])
         else:
