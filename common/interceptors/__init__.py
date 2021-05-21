@@ -7,5 +7,5 @@
 
 
 from .ApiHook import *
-from .CmsHook import *
+from .CrmHook import *
 from .AppHook import *
