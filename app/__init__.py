@@ -12,6 +12,8 @@ from .api.index.index import IndexApi
 
 from .crm.search.search import SearchApi
 from .crm.index.index import IndexCrmApi
+from .crm.test.test import TestCrmApi
+from .crm.admin.admin import RoleCrmApi
 from .crm.login.login import LoginCrmApi
 from .crm.product.product import ProductCrmApi
 from .crm.sku.sku import SkuApi, SkuPageApi
@@ -25,7 +27,11 @@ api.add_resource(IndexApi, '/', endpoint='api_index')
 crm_bp = Blueprint('crm', __name__)
 crm_api = Api(crm_bp)
 crm_api.add_resource(IndexCrmApi, '/', endpoint='crm_index')
+crm_api.add_resource(TestCrmApi, '/test', endpoint='crm_test')
 crm_api.add_resource(SearchApi, '/search', endpoint='crm_search')
+
+crm_api.add_resource(RoleCrmApi, '/role', '/role/<role_id>', endpoint='crm_role')
+
 crm_api.add_resource(LoginCrmApi, '/login', endpoint='crm_login')
 crm_api.add_resource(ProductCrmApi, '/product', '/product/<product_id>', endpoint='crm_product')
 crm_api.add_resource(SkuApi, '/sku', '/sku/<sku_id>', endpoint='crm_sku')

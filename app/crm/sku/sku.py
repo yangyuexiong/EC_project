@@ -88,7 +88,7 @@ class SkuApi(Resource):
     def delete(self, sku_id=None):
         sku_obj = Sku.query.get(sku_id)
         if sku_obj:
-            sku_obj.is_deleted = Sku.id
+            sku_obj.is_deleted = sku_obj.id
             db.session.commit()
             return api_result(code=204, message='操作成功', data=[])
         else:
