@@ -34,7 +34,7 @@ def before_request_cms():
             # 将 user 存放在全局 g 对象中
             check_user(token=token, model=Admin)
         else:
-            ab_code_2(1000001)
+            ab_code_2(666)
 
     else:
         g.app_user = None
