@@ -38,7 +38,13 @@ class SkuApi(Resource):
                     name = attr.get('attr_key')
                     remark = attr.get('remark')
                     ak = AttributeKey(
-                        prod_category_id=prod_category_id, product_id=product_id, name=name, remark=remark)
+                        prod_category_id=prod_category_id,
+                        product_id=product_id,
+                        name=name,
+                        creator=g.app_user.username,
+                        creator_id=g.app_user.id,
+                        remark=remark
+                    )
                     db.session.add(ak)
                     db.session.commit()
                     for av in attr_val:
@@ -68,7 +74,8 @@ class SkuApi(Resource):
                 ak.prod_category_id = category_id
                 ak.product_id = product_id
                 ak.name = attr_key
-                # Todo 更新人
+                ak.modifier = g.app_user.username
+                ak.modifier_id = g.app_user.id
                 db.session.commit()
 
                 for _av in attr_val_list:
@@ -89,6 +96,8 @@ class SkuApi(Resource):
         sku_obj = Sku.query.get(sku_id)
         if sku_obj:
             sku_obj.is_deleted = sku_obj.id
+            sku_obj.modifier = g.app_user.username
+            sku_obj.modifier_id = g.app_user.id
             db.session.commit()
             return api_result(code=204, message='操作成功', data=[])
         else:
