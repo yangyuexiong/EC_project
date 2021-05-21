@@ -28,6 +28,14 @@ class RoleCrmApi(Resource):
     DELETE: 角色删除
     """
 
+    def get(self, role_id):
+        role_obj = Role.query.get(role_id)
+        if role_obj:
+            role = role_obj.to_json()
+            return api_result(code=200, message='操作成功', data=role)
+        else:
+            ab_code_2(1000001)
+
     def post(self):
         data = request.get_json()
         role_name = data.get('role_name')
@@ -35,10 +43,24 @@ class RoleCrmApi(Resource):
             if Role.query.filter_by(name=role_name, is_deleted=0).first():
                 ab_code_2(1000002)
             else:
-                role = Role(name=role_name)
+                role = Role(name=role_name, creator=g.app_user.username, creator_id=g.app_user.id)
                 db.session.add(role)
                 db.session.commit()
                 return api_result(code=201, message='操作成功', data=[])
+        else:
+            ab_code_2(1000001)
+
+    def put(self):
+        data = request.get_json()
+        role_id = data.get('role_id')
+        role_name = data.get('role_name')
+        role = Role.query.get(role_id)
+        if role:
+            role.name = role_name
+            role.modifier = g.app_user.username
+            role.modifier_id = g.app_user.id
+            db.session.commit()
+            return api_result(code=203, message='操作成功', data=[])
         else:
             ab_code_2(1000001)
 
@@ -46,6 +68,8 @@ class RoleCrmApi(Resource):
         role_obj = Role.query.get(role_id)
         if role_obj:
             role_obj.is_deleted = role_obj.id
+            role_obj.modifier = g.app_user.username
+            role_obj.modifier_id = g.app_user.id
             db.session.commit()
             return api_result(code=204, message='操作成功', data=[])
         else:
