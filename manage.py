@@ -171,11 +171,87 @@ class SkuInit(Command):
         db.session.commit()
 
 
+class CrmAdmin(Command):
+
+    def run(self):
+        if Admin.query.filter_by(username='yangyuexiong', is_deleted=0).first():
+            raise ValueError('yangyuexiong 已经存在')
+        else:
+            admin = Admin(
+                username='yangyuexiong',
+                password='123456',
+                phone='15013038819',
+                mail='yangyuexiong33@gmail.com',
+                code='00001',
+                creator='shell',
+                creator_id='0',
+                remark='manage shell'
+            )
+            db.session.add(admin)
+            db.session.commit()
+            print('admin 创建完成')
+
+        if Role.query.filter_by(name='超级管理员', is_deleted=0).first():
+            raise ValueError('超级管理员 已经存在')
+        else:
+            role = Role(name='超级管理员', creator='shell', creator_id='0', remark='manage shell')
+            db.session.add(role)
+            db.session.commit()
+            print('role 创建完成')
+
+        api_resource = ApiResource(
+            name='crm首页',
+            url='/crm/index',
+            method='GET',
+            creator='shell',
+            creator_id='0',
+            remark='manage shell'
+        )
+        db.session.add(api_resource)
+        db.session.commit()
+        print('api_resource 创建完成')
+
+        permission = Permission(
+            name='yyx',
+            resource_id=api_resource.id,
+            resource_type='SERVER_API',
+            creator='shell',
+            creator_id='0',
+            remark='manage shell'
+        )
+        db.session.add(permission)
+        db.session.commit()
+        print('permission 创建完成')
+
+        mid_admin_role = MidAdminAndRole(
+            admin_id=admin.id,
+            role_id=role.id,
+            creator='shell',
+            creator_id='0',
+            remark='manage shell'
+        )
+        db.session.add(mid_admin_role)
+        db.session.commit()
+        print('mid_admin_role 创建完成')
+
+        mid_permission_role = MidPermissionAndRole(
+            permission_id=permission.id,
+            role_id=role.id,
+            creator='shell',
+            creator_id='0',
+            remark='manage shell'
+        )
+        db.session.add(mid_permission_role)
+        db.session.commit()
+        print('mid_permission_role 创建完成')
+
+
 # 添加命令
 manager.add_command('hello', Hello())
 manager.add_command('orm', TableCreateFirst())
 manager.add_command('table', TableCreate())
 manager.add_command('crm', CRMInit())
+manager.add_command('admin', CrmAdmin())
 
 
 @manager.option('-u', '--username', dest='username')

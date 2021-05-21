@@ -24,10 +24,6 @@ class Admin(BaseModel):
     modifier_id = db.Column(BIGINT(20, unsigned=True), comment='更新人id')
     remark = db.Column(db.String(255), comment='备注')
 
-    def __init__(self, username, password):
-        self.username = username
-        self.password = password
-
     @property
     def password(self):
         return self._password
@@ -80,6 +76,7 @@ class Permission(BaseModel):
     __table_args__ = {'comment': '后台权限表'}
     name = db.Column(db.String(50), nullable=False, comment='权限名称')
     resource_id = db.Column(BIGINT(20, unsigned=True), comment='ServerApi或WebRoute对应ec_crm_resource表')
+    resource_type = db.Column(db.String(32), comment='SERVER_API-接口;WEB_ROUTE-页面路由')
     creator = db.Column(db.String(32), comment='创建人')
     creator_id = db.Column(BIGINT(20, unsigned=True), comment='创建人id')
     modifier = db.Column(db.String(32), comment='更新人')
