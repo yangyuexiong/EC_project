@@ -13,10 +13,53 @@ from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, Mi
 class AdminCrmApi(Resource):
     """
     admin
+    GET: 后台用户详情
+    POST: 后台用户创建
+    PUT: 后台用户编辑
+    DELETE: 后台用户(启用/禁用)
     """
 
-    def get(self):
-        return api_result(code=200, message='admin index')
+    def get(self, admin_id):
+        admin_boj = Admin.query.get(admin_id)
+        if admin_boj:
+            admin = admin_boj.to_json(*['_password'])
+            return api_result(code=200, message='操作成功', data=admin)
+        else:
+            ab_code_2(1000001)
+
+    def post(self):
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        phone = data.get('phone')
+        mail = data.get('mail')
+        remark = data.get('remark')
+
+        if username and password:
+            query_admin = Admin.query.filter(
+                or_(Admin.username == username, Admin.phone == phone, Admin.mail == mail)).all()
+            if query_admin:
+                return api_result(code=200, message='用户已存在', data=[])
+            else:
+                code = str(Admin.query.count() + 1)
+                admin = Admin(
+                    username=username,
+                    password=password,
+                    phone=phone,
+                    mail=mail,
+                    code=code.zfill(5),
+                    creator=g.app_user.username,
+                    creator_id=g.app_user.id,
+                    remark=remark
+                )
+                db.session.add(admin)
+                db.session.commit()
+                return api_result(code=201, message='操作成功', data=[])
+        else:
+            ab_code_2(1000001)
+
+    def delete(self):
+        return
 
 
 class RoleCrmApi(Resource):
@@ -155,7 +198,7 @@ class PermissionCrmApi(Resource):
 class AdminRelRoleCrmApi(Resource):
     """
     admin rel role
-    POST:用户(添加/删除)角色
+    POST: 用户(添加/删除)角色
     """
 
     def post(self):
@@ -229,7 +272,7 @@ class AdminRelRoleCrmApi(Resource):
 class RoleRelPermissionCrmApi(Resource):
     """
     role rel permission
-    POST:角色(添加/删除)权限
+    POST: 角色(添加/删除)权限
     """
 
     def post(self):

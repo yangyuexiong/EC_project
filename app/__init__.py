@@ -13,7 +13,7 @@ from .api.index.index import IndexApi
 from .crm.search.search import SearchApi
 from .crm.index.index import IndexCrmApi
 from .crm.test.test import TestCrmApi
-from .crm.admin.admin import RoleCrmApi, PermissionCrmApi, AdminRelRoleCrmApi, RoleRelPermissionCrmApi
+from .crm.admin.admin import AdminCrmApi, RoleCrmApi, PermissionCrmApi, AdminRelRoleCrmApi, RoleRelPermissionCrmApi
 from .crm.login.login import LoginCrmApi
 from .crm.product.product import ProductCrmApi
 from .crm.sku.sku import SkuApi, SkuPageApi
@@ -31,6 +31,7 @@ crm_api.add_resource(TestCrmApi, '/test', endpoint='crm_test')
 crm_api.add_resource(SearchApi, '/search', endpoint='crm_search')
 crm_api.add_resource(LoginCrmApi, '/login', endpoint='crm_login')
 
+crm_api.add_resource(AdminCrmApi, '/admin', '/admin/<admin_id>', endpoint='crm_admin')
 crm_api.add_resource(AdminRelRoleCrmApi, '/admin/rel', endpoint='crm_admin_rel')
 crm_api.add_resource(RoleCrmApi, '/role', '/role/<role_id>', endpoint='crm_role')
 crm_api.add_resource(RoleRelPermissionCrmApi, '/role/rel', endpoint='crm_role_rel')
