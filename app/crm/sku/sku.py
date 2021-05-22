@@ -184,11 +184,16 @@ class SkuPageApi(Resource):
         )
 
         result_list = []
+        total = result.total
         for res in result.items:
-            print(res)
             sku_json = res[0].to_json()
             product_json = res[1].to_json()
             sku_json['product_json'] = product_json
             result_list.append(sku_json)
 
-        return api_result(code=200, message='操作成功', data=result_list)
+        result_data = {
+            'records': result_list,
+            'now_page': page,
+            'total': total
+        }
+        return api_result(code=200, message='操作成功', data=result_data)
