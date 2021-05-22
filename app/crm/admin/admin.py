@@ -152,9 +152,84 @@ class PermissionCrmApi(Resource):
             ab_code_2(1000001)
 
 
+class AdminRelRoleCrmApi(Resource):
+    """
+    admin rel role
+    POST:用户(添加/删除)角色
+    """
+
+    def post(self):
+        data = request.get_json()
+        admin_id = data.get('admin_id')
+        role_list = data.get('role_list', [])
+        keep_list = []  # 保留 -> is_deleted = 0
+        del_list = []  # 逻辑删除 -> is_deleted = 非 0
+        new_list = []  # 新增
+
+        if isinstance(role_list, list):
+            role_result = Role.query.filter(Role.id.in_(role_list)).all()
+            if len(role_result) == len(role_list):
+                admin = Admin.query.get(admin_id)
+                if admin:
+                    roles = [i.role_id for i in MidAdminAndRole.query.filter_by(admin_id=admin_id).all()]
+                    for current_role in roles:
+                        if current_role in role_list:
+                            keep_list.append(current_role)
+                        else:
+                            del_list.append(current_role)
+
+                    a = set(keep_list)
+                    b = set(role_list)
+                    a.update(b)
+                    new_list = list(b - set(keep_list))
+                    # print(keep_list)
+                    # print(del_list)
+                    # print(new_list)
+
+                    if keep_list:
+                        mid_a_r_list = MidAdminAndRole.query.filter(
+                            MidAdminAndRole.admin_id == admin_id,
+                            MidAdminAndRole.role_id.in_(keep_list)
+                        ).all()
+                        for mid in mid_a_r_list:
+                            mid.is_deleted = 0
+                            mid.modifier = g.app_user.username
+                            mid.modifier_id = g.app_user.id
+
+                    if del_list:
+                        mid_a_r_list = MidAdminAndRole.query.filter(
+                            MidAdminAndRole.admin_id == admin_id,
+                            MidAdminAndRole.role_id.in_(del_list)
+                        ).all()
+
+                        for mid in mid_a_r_list:
+                            mid.is_deleted = mid.id
+                            mid.modifier = g.app_user.username
+                            mid.modifier_id = g.app_user.id
+
+                    if new_list:
+                        for role_id in new_list:
+                            mid_a_r = MidAdminAndRole(
+                                admin_id=admin_id,
+                                role_id=role_id,
+                                creator=g.app_user.username,
+                                creator_id=g.app_user.id
+                            )
+                            db.session.add(mid_a_r)
+                    db.session.commit()
+                    return api_result(code=201, message='操作成功', data=[])
+                else:
+                    ab_code_2(1000001)
+            else:
+                ab_code_2(1000001)
+        else:
+            ab_code_2(1000001)
+
+
 class RoleRelPermissionCrmApi(Resource):
     """
     role rel permission
+    POST:角色(添加/删除)权限
     """
 
     def post(self):
