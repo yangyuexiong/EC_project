@@ -10,6 +10,7 @@ from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, Mi
     RouteResource
 
 
+# Todo 用户,角色,权限操作的装饰器
 class AdminCrmApi(Resource):
     """
     admin
