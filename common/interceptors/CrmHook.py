@@ -33,6 +33,15 @@ def before_request_cms():
             # 通过 token 查找 user
             # 将 user 存放在全局 g 对象中
             check_user(token=token, model=Admin)
+
+            # Todo
+            """
+            permission_list=[]
+            if request.path in permission_list:
+                pass
+            else:
+                ab_code_2(403)
+            """
         else:
             ab_code_2(666)
 
