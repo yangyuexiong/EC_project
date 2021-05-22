@@ -200,6 +200,59 @@ class AdminCrmApi(Resource):
         return
 
 
+class RolePageApi(Resource):
+    """
+    role page api
+    POST: role分页模糊查询
+    """
+
+    def post(self):
+        data = request.get_json()
+        role_id = data.get('role_id')
+        name = data.get('name')
+        page, size = page_size(**data)
+
+        sql = """
+        SELECT *
+        FROM ec_crm_role
+        WHERE
+        id LIKE"%%"
+        and name LIKE"%超级%"
+        and is_deleted=0
+        ORDER BY create_timestamp LIMIT 0,20;
+        """
+
+        like_list = [
+            Role.id.ilike("%{}%".format(role_id if role_id else '')),
+            Role.name.ilike("%{}%".format(name if name else ''))
+        ]
+        where_list = [
+            Role.is_deleted == 0
+        ]
+        result = Role.query.filter(
+            and_(*like_list),
+            *where_list
+        ).order_by(
+            Role.create_time.desc()
+        ).paginate(
+            page=int(page),
+            per_page=int(size),
+            error_out=False
+        )
+        result_list = []
+        total = result.total
+        for res in result.items:
+            role_json = res.to_json()
+            result_list.append(role_json)
+
+        result_data = {
+            'records': result_list,
+            'now_page': page,
+            'total': total
+        }
+        return api_result(code=200, message='操作成功', data=result_data)
+
+
 class RoleCrmApi(Resource):
     """
     role

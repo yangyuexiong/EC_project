@@ -13,7 +13,7 @@ from .api.index.index import IndexApi
 from .crm.search.search import SearchApi
 from .crm.index.index import IndexCrmApi
 from .crm.test.test import TestCrmApi
-from .crm.admin.admin import AdminPageApi, AdminCrmApi, RoleCrmApi, PermissionCrmApi, AdminRelRoleCrmApi, \
+from .crm.admin.admin import AdminPageApi, AdminCrmApi, RolePageApi, RoleCrmApi, PermissionCrmApi, AdminRelRoleCrmApi, \
     RoleRelPermissionCrmApi
 from .crm.login.login import LoginCrmApi
 from .crm.product.product import ProductCrmApi
@@ -35,8 +35,11 @@ crm_api.add_resource(LoginCrmApi, '/login', endpoint='crm_login')
 crm_api.add_resource(AdminPageApi, '/admin/page', endpoint='crm_admin_page')
 crm_api.add_resource(AdminCrmApi, '/admin', '/admin/<admin_id>', endpoint='crm_admin')
 crm_api.add_resource(AdminRelRoleCrmApi, '/admin/rel', endpoint='crm_admin_rel')
+
+crm_api.add_resource(RolePageApi, '/role/page', endpoint='crm_role_page')
 crm_api.add_resource(RoleCrmApi, '/role', '/role/<role_id>', endpoint='crm_role')
 crm_api.add_resource(RoleRelPermissionCrmApi, '/role/rel', endpoint='crm_role_rel')
+
 crm_api.add_resource(PermissionCrmApi, '/permission', '/permission/<permission_id>', endpoint='crm_permission')
 
 crm_api.add_resource(ProductCrmApi, '/product', '/product/<product_id>', endpoint='crm_product')
