@@ -22,7 +22,7 @@ class LoginCrmApi(Resource):
             username = data.get('username', '')
             password = data.get('password', '')
             admin = Admin.query.filter_by(username=username).first()
-            if admin and admin.check_password(password):
+            if admin and admin.check_password(password) and admin.is_deleted == 0:
                 """
                 检查是否存在旧token并且生成新token覆盖旧token,或创建一个新的token。然后添加至返回值。
                 """
@@ -32,7 +32,7 @@ class LoginCrmApi(Resource):
                 admin_obj['token'] = t.token
                 return api_result(code=200, message='登录成功', data=admin_obj)
             else:
-                return api_result(code=200, message='用户不存在或密码错误', data=[])
+                return api_result(code=200, message='用户不存在或密码错误或被禁用', data=[])
         else:
             ab_code_2(1000001)
 
