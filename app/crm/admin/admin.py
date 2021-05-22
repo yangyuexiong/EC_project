@@ -11,6 +11,142 @@ from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, Mi
 
 
 # Todo 用户,角色,权限操作的装饰器
+# Todo 缓存用户权限->redis
+# Todo 用户权限变更刷新redis缓存
+
+
+def query_admin_role_permission(admin_id):
+    """
+
+    :param admin_id:
+    :return:
+    """
+    d = {
+        "role_list": [],
+        "permission_list": [],
+        "api_resource_list": [],
+        "route_resource_list": []
+    }
+
+    """查询用户所有有效角色id"""
+    role_id_list = [role.role_id for role in MidAdminAndRole.query.filter_by(admin_id=admin_id, is_deleted=0).all()]
+    # print(role_id_list)
+
+    """查询用户拥有的所有角色"""
+    role_list = [
+        role.to_json() for role in Role.query.filter(
+            Role.id.in_(role_id_list),
+            Role.is_deleted == 0
+        ).all()
+    ]
+    # print(role_list)
+
+    """查询角色下所有有效权限id"""
+    permission_id_list = [
+        permission.permission_id for permission in MidPermissionAndRole.query.filter(
+            MidPermissionAndRole.role_id.in_(role_id_list),
+            MidPermissionAndRole.is_deleted == 0
+        ).all()
+    ]
+    # print(permission_id_list)
+
+    """查询角色拥有的所有权限"""
+    permission_list = [
+        permission.to_json() for permission in Permission.query.filter(
+            Permission.id.in_(permission_id_list),
+            Permission.is_deleted == 0
+        ).all()
+    ]
+    # print(permission_list)
+
+    """查询权限所有resource"""
+    api_resource_list = []
+    route_resource_list = []
+    for res in permission_list:
+        resource_id = res.get('resource_id')
+        resource_type = res.get('resource_type')
+        if resource_type == 'SERVER_API':
+            api_resource_list.append(resource_id)
+        elif resource_type == 'WEB_ROUTE':
+            route_resource_list.append(resource_id)
+        else:
+            pass
+
+    d['role_list'] = role_list
+    d['permission_list'] = permission_list
+    d['api_resource_list'] = api_resource_list
+    d['route_resource_list'] = route_resource_list
+    json_format(d)
+
+
+def refresh_cache(admin_id):
+    """
+    更新 Redis 缓存
+    :param admin_id:
+    :return:
+    """
+    return
+
+
+class AdminPageApi(Resource):
+    """
+    admin page api
+    POST: admin分页模糊查询
+    """
+
+    def post(self):
+        data = request.get_json()
+        admin_id = data.get('admin_id')
+        username = data.get('username')
+        phone = data.get('phone')
+        is_deleted = data.get('is_deleted')
+        page, size = page_size(**data)
+
+        sql = """
+        SELECT * 
+        FROM ec_crm_admin  
+        WHERE 
+        id LIKE"%%" 
+        and username LIKE"%c%" 
+        and phone LIKE"%150%" 
+        and is_deleted=0
+        ORDER BY create_timestamp LIMIT 0,20;
+        """
+
+        like_list = [
+            Admin.id.ilike("%{}%".format(admin_id if admin_id else '')),
+            Admin.username.ilike("%{}%".format(username if username else '')),
+            Admin.phone.ilike("%{}%".format(phone if phone else ''))
+        ]
+
+        where_list = []
+        where_list.append(Admin.is_deleted != 0) if is_deleted and is_deleted != 0 else where_list.append(
+            Admin.is_deleted == 0)
+
+        result = Admin.query.filter(
+            and_(*like_list),
+            *where_list
+        ).order_by(
+            Admin.create_time.desc()
+        ).paginate(
+            page=int(page),
+            per_page=int(size),
+            error_out=False
+        )
+        result_list = []
+        total = result.total
+        for res in result.items:
+            admin_json = res.to_json(*['_password'])
+            result_list.append(admin_json)
+
+        result_data = {
+            'records': result_list,
+            'now_page': page,
+            'total': total
+        }
+        return api_result(code=200, message='操作成功', data=result_data)
+
+
 class AdminCrmApi(Resource):
     """
     admin
@@ -24,6 +160,7 @@ class AdminCrmApi(Resource):
         admin_boj = Admin.query.get(admin_id)
         if admin_boj:
             admin = admin_boj.to_json(*['_password'])
+            query_admin_role_permission(admin_id)
             return api_result(code=200, message='操作成功', data=admin)
         else:
             ab_code_2(1000001)
