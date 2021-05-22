@@ -103,7 +103,6 @@ class MidAdminAndRole(BaseModel):
     creator_id = db.Column(BIGINT(20, unsigned=True), comment='创建人id')
     modifier = db.Column(db.String(32), comment='更新人')
     modifier_id = db.Column(BIGINT(20, unsigned=True), comment='更新人id')
-    remark = db.Column(db.String(255), comment='备注')
 
     def __repr__(self):
         return 'MidAdminAndRole 模型对象-> ID:{} 用户id:{} 角色id:{}'.format(self.id, self.admin_id, self.role_id)
@@ -118,7 +117,6 @@ class MidPermissionAndRole(BaseModel):
     creator_id = db.Column(BIGINT(20, unsigned=True), comment='创建人id')
     modifier = db.Column(db.String(32), comment='更新人')
     modifier_id = db.Column(BIGINT(20, unsigned=True), comment='更新人id')
-    remark = db.Column(db.String(255), comment='备注')
 
     def __repr__(self):
         return 'MidPermissionAndRole 模型对象-> ID:{} 角色id:{} 权限id:{}'.format(self.id, self.role_id, self.permission_id)

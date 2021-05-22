@@ -150,3 +150,77 @@ class PermissionCrmApi(Resource):
             return api_result(code=204, message='操作成功', data=[])
         else:
             ab_code_2(1000001)
+
+
+class RoleRelPermissionCrmApi(Resource):
+    """
+    role rel permission
+    """
+
+    def post(self):
+        data = request.get_json()
+        role_id = data.get('role_id')
+        permission_list = data.get('permission_list', [])
+        keep_list = []  # 保留 -> is_deleted = 0
+        del_list = []  # 逻辑删除 -> is_deleted = 非 0
+        new_list = []  # 新增
+
+        if isinstance(permission_list, list):
+            permission_result = Permission.query.filter(Permission.id.in_(permission_list)).all()
+            if len(permission_result) == len(permission_list):
+                role = Role.query.get(role_id)
+                if role:
+                    permissions = [i.permission_id for i in MidPermissionAndRole.query.filter_by(role_id=role_id).all()]
+                    for current_p in permissions:
+                        if current_p in permission_list:
+                            keep_list.append(current_p)
+                        else:
+                            del_list.append(current_p)
+
+                    a = set(keep_list)
+                    b = set(permission_list)
+                    a.update(b)
+                    new_list = list(b - set(keep_list))
+
+                    # print(keep_list)
+                    # print(del_list)
+                    # print(new_list)
+
+                    if keep_list:
+                        mid_p_r_list = MidPermissionAndRole.query.filter(
+                            MidPermissionAndRole.role_id == role_id,
+                            MidPermissionAndRole.permission_id.in_(keep_list)
+                        ).all()
+                        for mid in mid_p_r_list:
+                            mid.is_deleted = 0
+                            mid.modifier = g.app_user.username
+                            mid.modifier_id = g.app_user.id
+
+                    if del_list:
+                        mid_p_r_list = MidPermissionAndRole.query.filter(
+                            MidPermissionAndRole.role_id == role_id,
+                            MidPermissionAndRole.permission_id.in_(del_list)
+                        ).all()
+
+                        for mid in mid_p_r_list:
+                            mid.is_deleted = mid.id
+                            mid.modifier = g.app_user.username
+                            mid.modifier_id = g.app_user.id
+
+                    if new_list:
+                        for p in new_list:
+                            mid_r_p = MidPermissionAndRole(
+                                permission_id=p,
+                                role_id=role.id,
+                                creator=g.app_user.username,
+                                creator_id=g.app_user.id
+                            )
+                            db.session.add(mid_r_p)
+                    db.session.commit()
+                    return api_result(code=201, message='操作成功', data=[])
+                else:
+                    ab_code_2(1000001)
+            else:
+                ab_code_2(1000001)
+        else:
+            ab_code_2(1000001)
