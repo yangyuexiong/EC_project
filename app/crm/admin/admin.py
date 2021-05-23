@@ -313,6 +313,84 @@ class RoleCrmApi(Resource):
             ab_code_2(1000001)
 
 
+class PermissionPageApi(Resource):
+    """
+    permission page api
+    POST: permission分页模糊查询
+    """
+
+    def post(self):
+        data = request.get_json()
+        permission_id = data.get('permission_id')
+        permission_name = data.get('permission_name')
+        api_name = data.get('api_name')
+        url = data.get('url')
+        page, size = page_size(**data)
+
+        sql = """
+        SELECT
+        P.id,
+        P.name,
+        P.resource_id,
+        P.resource_type,
+        API.id,
+        API.name,
+        API.url,
+        API.method 
+        FROM ec_crm_permission P LEFT JOIN ec_crm_api_resource API ON P.resource_id=API.id 
+        WHERE (
+        P.id LIKE"%%" 
+        and P.name LIKE"%B%" 
+        and API.id LIKE"%%" 
+        and API.name LIKE"%%" 
+        and API.url LIKE"%%"
+        )
+        and P.is_deleted=0 and API.is_deleted=0
+        ORDER BY P.create_timestamp LIMIT 0,20;
+        """
+
+        like_list = [
+            Permission.id.ilike("%{}%".format(permission_id if permission_id else '')),
+            Permission.name.ilike("%{}%".format(permission_name if permission_name else '')),
+            ApiResource.name.ilike("%{}%".format(api_name if api_name else '')),
+            ApiResource.url.ilike("%{}%".format(url if url else ''))
+        ]
+        where_list = [
+            Permission.is_deleted == 0
+        ]
+
+        result = Permission.query.join(
+            ApiResource,
+            Permission.resource_id == ApiResource.id
+        ).filter(
+            and_(*like_list),
+            *where_list
+        ).with_entities(
+            Permission, ApiResource
+        ).order_by(
+            Permission.create_time.desc()
+        ).paginate(
+            page=int(page),
+            per_page=int(size),
+            error_out=False
+        )
+
+        result_list = []
+        total = result.total
+        for res in result.items:
+            permission_json = res[0].to_json()
+            api_resource_json = res[1].to_json()
+            permission_json['api_resource_json'] = api_resource_json
+            result_list.append(permission_json)
+
+        result_data = {
+            'records': result_list,
+            'now_page': page,
+            'total': total
+        }
+        return api_result(code=200, message='操作成功', data=result_data)
+
+
 class PermissionCrmApi(Resource):
     """
     permission
