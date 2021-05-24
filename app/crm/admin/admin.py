@@ -541,8 +541,64 @@ class AdminRelRoleCrmApi(Resource):
 class RoleRelPermissionCrmApi(Resource):
     """
     role rel permission
+    GET: 查询角色下所有权限
     POST: 角色(添加/删除)权限
     """
+
+    def get(self, role_id):
+        role_obj = Role.query.get(role_id)
+        if role_obj:
+            role = role_obj.to_json()
+            mid_list = [p.permission_id for p in MidPermissionAndRole.query.filter_by(role_id=role_id).all()]
+            if mid_list:
+                sql = """
+                SELECT
+                P.id,
+                P.name,
+                P.creator_id,
+                P.creator,
+                P.create_time,
+                API.id,
+                API.name,
+                API.url,
+                API.method,
+                API.creator_id,
+                API.creator,
+                API.create_time
+                FROM ec_crm_permission P LEFT JOIN ec_crm_api_resource API ON P.resource_id=API.id 
+                WHERE 
+                (P.is_deleted=0 and API.is_deleted=0)
+                ORDER BY P.create_timestamp LIMIT 0,20;
+                """
+                where_list = [
+                    Permission.is_deleted == 0,
+                    ApiResource.is_deleted == 0
+                ]
+                result = Permission.query.join(
+                    ApiResource,
+                    Permission.resource_id == ApiResource.id
+                ).filter(
+                    *where_list
+                ).with_entities(
+                    Permission, ApiResource
+                ).order_by(
+                    Permission.create_time.desc()
+                ).all()
+
+                result_list = []
+                for res in result:
+                    permission_json = res[0].to_json()
+                    api_resource_json = res[1].to_json()
+                    permission_json['api_resource_json'] = api_resource_json
+                    result_list.append(permission_json)
+
+                role['permission_list'] = result_list
+                return api_result(code=200, message='操作成功', data=role)
+            else:
+                role['permission_list'] = []
+                return api_result(code=200, message='操作成功', data=role)
+        else:
+            ab_code_2(1000001)
 
     def post(self):
         data = request.get_json()

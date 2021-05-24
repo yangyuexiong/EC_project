@@ -38,7 +38,7 @@ crm_api.add_resource(AdminRelRoleCrmApi, '/admin/rel', endpoint='crm_admin_rel')
 
 crm_api.add_resource(RolePageApi, '/role/page', endpoint='crm_role_page')
 crm_api.add_resource(RoleCrmApi, '/role', '/role/<role_id>', endpoint='crm_role')
-crm_api.add_resource(RoleRelPermissionCrmApi, '/role/rel', endpoint='crm_role_rel')
+crm_api.add_resource(RoleRelPermissionCrmApi, '/role/rel', '/role/rel/<role_id>', endpoint='crm_role_rel')
 
 crm_api.add_resource(PermissionPageApi, '/permission/page', endpoint='crm_permission_page')
 crm_api.add_resource(PermissionCrmApi, '/permission', '/permission/<permission_id>', endpoint='crm_permission')
