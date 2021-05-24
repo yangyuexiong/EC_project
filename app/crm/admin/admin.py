@@ -687,6 +687,58 @@ class ApiResourceCrmApi(Resource):
             ab_code_2(1000001)
 
 
+class ApiResourcePageCrmApi(Resource):
+    """
+    api resource page
+    POST: api resource 分页模糊查询
+    """
+
+    def post(self):
+        data = request.get_json()
+        api_resource_id = data.get('api_resource_id')
+        name = data.get('name')
+        url = data.get('url')
+        page, size = page_size(**data)
+
+        sql = """
+        SELECT * 
+        FROM ec_crm_api_resource 
+        WHERE (id LIKE"%%" and name LIKE"%ok%" and url LIKE"%%") 
+        and is_deleted=0 
+        ORDER BY create_timestamp LIMIT 0,20;
+        """
+
+        like_list = [
+            ApiResource.id.ilike("%{}%".format(api_resource_id if api_resource_id else '')),
+            ApiResource.name.ilike("%{}%".format(name if name else '')),
+            ApiResource.url.ilike("%{}%".format(url if url else ''))
+        ]
+        where_list = [
+            ApiResource.is_deleted == 0
+        ]
+
+        result = ApiResource.query.filter(
+            and_(*like_list),
+            *where_list
+        ).order_by(
+            ApiResource.create_time.desc()
+        ).paginate(
+            page=int(page),
+            per_page=int(size),
+            error_out=False
+        )
+        result_list = []
+        total = result.total
+        for res in result.items:
+            result_list.append(res.to_json())
+        result_data = {
+            'records': result_list,
+            'now_page': page,
+            'total': total
+        }
+        return api_result(code=200, message='操作成功', data=result_data)
+
+
 class RouteResourceCrmApi(Resource):
     """
     权限页面路由
