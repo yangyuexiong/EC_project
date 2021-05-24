@@ -14,8 +14,7 @@ from .crm.search.search import SearchApi
 from .crm.index.index import IndexCrmApi
 from .crm.test.test import TestCrmApi
 from .crm.admin.admin import AdminPageApi, AdminCrmApi, RolePageApi, RoleCrmApi, PermissionPageApi, PermissionCrmApi, \
-    AdminRelRoleCrmApi, \
-    RoleRelPermissionCrmApi
+    AdminRelRoleCrmApi, RoleRelPermissionCrmApi, ApiResourceCrmApi
 from .crm.login.login import LoginCrmApi
 from .crm.product.product import ProductCrmApi
 from .crm.sku.sku import SkuApi, SkuPageApi
@@ -47,3 +46,5 @@ crm_api.add_resource(PermissionCrmApi, '/permission', '/permission/<permission_i
 crm_api.add_resource(ProductCrmApi, '/product', '/product/<product_id>', endpoint='crm_product')
 crm_api.add_resource(SkuApi, '/sku', '/sku/<sku_id>', endpoint='crm_sku')
 crm_api.add_resource(SkuPageApi, '/sku/page', endpoint='crm_sku_page')
+
+crm_api.add_resource(ApiResourceCrmApi, '/api_resource', '/api_resource/<api_resource_id>', endpoint='crm_api_resource')

@@ -611,3 +611,83 @@ class RoleRelPermissionCrmApi(Resource):
                 ab_code_2(1000001)
         else:
             ab_code_2(1000001)
+
+
+class ApiResourceCrmApi(Resource):
+    """
+    权限关联接口
+    GET: 接口详情
+    POST: 接口新增
+    PUT: 接口编辑
+    DELETE: 接口(启用/禁用)
+    """
+
+    def get(self, api_resource_id):
+        api_res_obj = ApiResource.query.get(api_resource_id)
+        if api_res_obj:
+            api_res = api_res_obj.to_json()
+            return api_result(code=200, message='操作成功', data=api_res)
+        else:
+            ab_code_2(1000001)
+
+    def post(self):
+        data = request.get_json()
+        name = data.get('name')
+        url = data.get('url')
+        method = data.get('method')
+        remark = data.get('remark')
+        if name and url:
+            api_res = ApiResource.query.filter(or_(ApiResource.name == name, ApiResource.url == url)).first()
+            if name and url and not api_res:
+                new_api_res = ApiResource(name=name, url=url, method=method, remark=remark)
+                db.session.add(new_api_res)
+                db.session.commit()
+                return api_result(code=201, message='操作成功')
+            else:
+                return api_result(code=200, message='接口或名称已经存在')
+        else:
+            ab_code_2(1000001)
+
+    def put(self):
+        data = request.get_json()
+        api_resource_id = data.get('api_resource_id')
+        name = data.get('name')
+        url = data.get('url')
+        method = data.get('method')
+        remark = data.get('remark')
+        if name and url:
+            api_res = ApiResource.query.get(api_resource_id)
+            api_query = ApiResource.query.filter(or_(ApiResource.name == name, ApiResource.url == url)).first()
+            if api_res and not api_query:
+                api_res.name = name
+                api_res.url = url
+                api_res.method = method
+                api_res.remark = remark
+                api_res.modifier = g.app_user.username
+                api_res.modifier_id = g.app_user.id
+                db.session.commit()
+                return api_result(code=203, message='操作成功')
+            else:
+                return api_result(code=200, message='接口或名称已经存在')
+        else:
+            ab_code_2(1000001)
+
+    def delete(self):
+        data = request.get_json()
+        api_resource_id = data.get('api_resource_id')
+        is_deleted = data.get('is_deleted')
+        api_res = ApiResource.query.get(api_resource_id)
+        if api_res:
+            api_res.is_deleted = is_deleted if is_deleted == 0 else api_res.id
+            api_res.modifier = g.app_user.username
+            api_res.modifier_id = g.app_user.id
+            db.session.commit()
+            return api_result(code=204, message='操作成功')
+        else:
+            ab_code_2(1000001)
+
+
+class RouteResourceCrmApi(Resource):
+    """
+    权限页面路由
+    """
