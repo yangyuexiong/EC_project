@@ -208,7 +208,18 @@ class AdminCrmApi(Resource):
             ab_code_2(1000001)
 
     def delete(self):
-        return
+        data = request.get_json()
+        admin_id = data.get('admin_id')
+        is_deleted = data.get('is_deleted')
+        admin = Admin.query.get(admin_id)
+        if admin:
+            admin.is_deleted = is_deleted if is_deleted in [0, '0'] else admin.id
+            admin.modifier = g.app_user.username
+            admin.modifier_id = g.app_user.id
+            db.session.commit()
+            return api_result(code=204, message='操作成功')
+        else:
+            ab_code_2(1000001)
 
 
 class RolePageApi(Resource):
