@@ -11,8 +11,84 @@ from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, Mi
 
 
 # Todo 用户,角色,权限操作的装饰器
-# Todo 缓存用户权限->redis
 # Todo 用户权限变更刷新redis缓存
+
+
+def query_admin_permission_info(admin_id):
+    """
+    获取用户角色权限
+    :param admin_id:
+    :return:
+    """
+    query_admin = """
+        SELECT 
+        id,username,phone,mail,code,creator,modifier,create_time,update_time,is_deleted,status,remark 
+        FROM ec_crm_admin 
+        WHERE id={};""".format(admin_id)
+    admin_res = project_db.select(query_admin, only=True)
+    print(query_admin)
+    # print(admin_res)
+
+    if admin_res:
+        query_role = """
+        SELECT 
+        id,name,creator,modifier,create_time,update_time,is_deleted,status,remark 
+        FROM ec_crm_role 
+        WHERE id in (SELECT role_id FROM ec_crm_mid_admin_role WHERE admin_id={});""".format(admin_id)
+        role_res = project_db.select(query_role)
+        print(query_role)
+        # print(role_res)
+
+        role_id_list = [r_id.get('id') for r_id in role_res]
+        # print(tuple(role_id_list))
+
+        query_permission = """
+        SELECT 
+        P.id,
+        P.name,
+        P.resource_id,
+        P.resource_type,
+        API.name,
+        API.url,
+        API.method,
+        P.is_deleted,
+        P.creator,
+        P.modifier,
+        P.create_time,
+        P.update_time,
+        P.remark,
+        API.remark
+        FROM ec_crm_permission P LEFT JOIN ec_crm_api_resource API ON P.resource_id=API.id  
+        WHERE P.id in (SELECT permission_id FROM ec_crm_mid_permission_role WHERE role_id in {});
+        """.format(tuple(role_id_list))
+        permission_res = project_db.select(query_permission)
+        print(query_permission)
+        # print(permission_res)
+        url_list = []
+        route_list = []
+        other_list = []
+        for p in permission_res:
+            url = p.get('url')
+            resource_type = p.get('resource_type')
+            if resource_type == 'SERVER_API':
+                url_list.append(url)
+            elif resource_type == 'WEB_ROUTE':
+                route_list.append(url)
+            else:
+                other_list.append(url)
+
+        admin_res['role_list'] = role_res
+        admin_res['role_id_list'] = role_id_list
+        admin_res['permission_list'] = permission_res
+        admin_res['url_list'] = url_list
+        admin_res['route_list'] = route_list
+        admin_res['other_list'] = other_list
+
+        redis_key = 'auth:{}'.format(admin_id)
+        R.set(redis_key, json.dumps(admin_res))
+        return admin_res
+    else:
+        return admin_res
 
 
 def query_admin_role_permission(admin_id):
@@ -23,9 +99,22 @@ def query_admin_role_permission(admin_id):
     """
     d = {
         "role_list": [],
+        "role_id_list": [],
         "permission_list": [],
+        "permission_id_list": [],
         "api_resource_list": [],
         "route_resource_list": []
+    }
+    admin_info = {
+        "role_list": [
+            {
+                "api_resource_list": [],
+                "route_resource_list": []
+            }
+        ],
+        "role_id_list": [],
+        "url_list": [],
+        "route_list": []
     }
 
     """查询用户所有有效角色id"""
@@ -77,6 +166,17 @@ def query_admin_role_permission(admin_id):
     d['api_resource_list'] = api_resource_list
     d['route_resource_list'] = route_resource_list
     json_format(d)
+
+    admin_info = {
+        "role_list": [
+            {
+                "api_resource_list": [],
+                "route_resource_list": []
+            }
+        ],
+        "url_list": [],
+        "route_list": []
+    }
 
 
 def refresh_cache(admin_id):
@@ -546,6 +646,8 @@ class RoleRelPermissionCrmApi(Resource):
     """
 
     def get(self, role_id):
+        query_admin_permission_info(1)
+
         role_obj = Role.query.get(role_id)
         if role_obj:
             role = role_obj.to_json()
