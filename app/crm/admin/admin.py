@@ -11,7 +11,6 @@ from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, Mi
 
 
 # Todo 用户,角色,权限操作的装饰器
-# Todo 用户权限变更刷新redis缓存
 
 
 def query_admin_permission_info(admin_id):
@@ -673,7 +672,11 @@ class RoleRelPermissionCrmApi(Resource):
                             )
                             db.session.add(mid_r_p)
                     db.session.commit()
-                    return api_result(code=201, message='操作成功', data=[])
+
+                    admin_id_list = [m.admin_id for m in MidAdminAndRole.query.filter_by(role_id=role_id).all()]
+                    [query_admin_permission_info(admin_id=a_id) for a_id in admin_id_list]
+
+                    return api_result(code=201, message='操作成功', data=admin_id_list)
                 else:
                     ab_code_2(1000001)
             else:
