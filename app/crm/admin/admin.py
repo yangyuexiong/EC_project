@@ -281,7 +281,7 @@ class RoleCrmApi(Resource):
     GET: 角色详情
     POST: 角色新增
     PUT: 角色编辑
-    DELETE: 角色删除
+    DELETE: 角色(启用/禁用)
     """
 
     def get(self, role_id):
@@ -323,14 +323,17 @@ class RoleCrmApi(Resource):
         else:
             ab_code_2(1000001)
 
-    def delete(self, role_id):
-        role_obj = Role.query.get(role_id)
-        if role_obj:
-            role_obj.is_deleted = role_obj.id
-            role_obj.modifier = g.app_user.username
-            role_obj.modifier_id = g.app_user.id
+    def delete(self):
+        data = request.get_json()
+        role_id = data.get('role_id')
+        is_deleted = data.get('is_deleted')
+        role = Role.query.get(role_id)
+        if role:
+            role.is_deleted = is_deleted if is_deleted in [0, '0'] else role.id
+            role.modifier = g.app_user.username
+            role.modifier_id = g.app_user.id
             db.session.commit()
-            return api_result(code=204, message='操作成功', data=[])
+            return api_result(code=204, message='操作成功')
         else:
             ab_code_2(1000001)
 
