@@ -90,6 +90,9 @@ def query_admin_permission_info(admin_id):
         return admin_res
 
 
+"""admin"""
+
+
 class AdminPageApi(Resource):
     """
     admin page api
@@ -213,6 +216,9 @@ class AdminCrmApi(Resource):
             ab_code_2(1000001)
 
 
+"""role"""
+
+
 class RolePageApi(Resource):
     """
     role page api
@@ -327,6 +333,9 @@ class RoleCrmApi(Resource):
             return api_result(code=204, message='操作成功')
         else:
             ab_code_2(1000001)
+
+
+"""permission"""
 
 
 class PermissionPageApi(Resource):
@@ -481,6 +490,9 @@ class PermissionCrmApi(Resource):
             return api_result(code=204, message='操作成功')
         else:
             ab_code_2(1000001)
+
+
+"""rel"""
 
 
 class AdminRelRoleCrmApi(Resource):
@@ -691,6 +703,9 @@ class RoleRelPermissionCrmApi(Resource):
                 ab_code_2(1000001)
         else:
             ab_code_2(1000001)
+
+
+"""resource"""
 
 
 class ApiResourceCrmApi(Resource):
