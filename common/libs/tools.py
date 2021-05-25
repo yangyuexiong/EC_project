@@ -268,6 +268,8 @@ class MyPyMysql:
                                 new_r[k] = v
                                 # print(k, v, type(v))
                                 # print("select.__func 异常:{}".format(str(e) if self.debug else ''))
+                        elif isinstance(v, datetime):
+                            new_r[k] = str(v)
                         else:
                             new_r[k] = v
                     new_list.append(new_r)

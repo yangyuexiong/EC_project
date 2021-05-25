@@ -96,7 +96,10 @@ class Permission(BaseModel):
 
 class MidAdminAndRole(BaseModel):
     __tablename__ = 'ec_crm_mid_admin_role'
-    __table_args__ = {'comment': '用户角色中间表'}
+    __table_args__ = (
+        db.Index('idx_admin_role', 'admin_id', 'role_id', 'is_deleted'),
+        {'comment': '用户角色中间表'}
+    )
     admin_id = db.Column(BIGINT(20, unsigned=True), comment='后台用户id')
     role_id = db.Column(BIGINT(20, unsigned=True), comment='后台用户id')
     creator = db.Column(db.String(32), comment='创建人')
@@ -110,7 +113,10 @@ class MidAdminAndRole(BaseModel):
 
 class MidPermissionAndRole(BaseModel):
     __tablename__ = 'ec_crm_mid_permission_role'
-    __table_args__ = {'comment': '权限角色中间表'}
+    __table_args__ = (
+        db.Index('idx_role_permission', 'role_id', 'permission_id', 'is_deleted'),
+        {'comment': '权限角色中间表'}
+    )
     permission_id = db.Column(BIGINT(20, unsigned=True), comment='后台用户id')
     role_id = db.Column(BIGINT(20, unsigned=True), comment='后台用户id')
     creator = db.Column(db.String(32), comment='创建人')
