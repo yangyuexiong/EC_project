@@ -91,94 +91,6 @@ def query_admin_permission_info(admin_id):
         return admin_res
 
 
-def query_admin_role_permission(admin_id):
-    """
-
-    :param admin_id:
-    :return:
-    """
-    d = {
-        "role_list": [],
-        "role_id_list": [],
-        "permission_list": [],
-        "permission_id_list": [],
-        "api_resource_list": [],
-        "route_resource_list": []
-    }
-    admin_info = {
-        "role_list": [
-            {
-                "api_resource_list": [],
-                "route_resource_list": []
-            }
-        ],
-        "role_id_list": [],
-        "url_list": [],
-        "route_list": []
-    }
-
-    """查询用户所有有效角色id"""
-    role_id_list = [role.role_id for role in MidAdminAndRole.query.filter_by(admin_id=admin_id, is_deleted=0).all()]
-    # print(role_id_list)
-
-    """查询用户拥有的所有角色"""
-    role_list = [
-        role.to_json() for role in Role.query.filter(
-            Role.id.in_(role_id_list),
-            Role.is_deleted == 0
-        ).all()
-    ]
-    # print(role_list)
-
-    """查询角色下所有有效权限id"""
-    permission_id_list = [
-        permission.permission_id for permission in MidPermissionAndRole.query.filter(
-            MidPermissionAndRole.role_id.in_(role_id_list),
-            MidPermissionAndRole.is_deleted == 0
-        ).all()
-    ]
-    # print(permission_id_list)
-
-    """查询角色拥有的所有权限"""
-    permission_list = [
-        permission.to_json() for permission in Permission.query.filter(
-            Permission.id.in_(permission_id_list),
-            Permission.is_deleted == 0
-        ).all()
-    ]
-    # print(permission_list)
-
-    """查询权限所有resource"""
-    api_resource_list = []
-    route_resource_list = []
-    for res in permission_list:
-        resource_id = res.get('resource_id')
-        resource_type = res.get('resource_type')
-        if resource_type == 'SERVER_API':
-            api_resource_list.append(resource_id)
-        elif resource_type == 'WEB_ROUTE':
-            route_resource_list.append(resource_id)
-        else:
-            pass
-
-    d['role_list'] = role_list
-    d['permission_list'] = permission_list
-    d['api_resource_list'] = api_resource_list
-    d['route_resource_list'] = route_resource_list
-    json_format(d)
-
-    admin_info = {
-        "role_list": [
-            {
-                "api_resource_list": [],
-                "route_resource_list": []
-            }
-        ],
-        "url_list": [],
-        "route_list": []
-    }
-
-
 def refresh_cache(admin_id):
     """
     更新 Redis 缓存
@@ -629,6 +541,7 @@ class AdminRelRoleCrmApi(Resource):
                             )
                             db.session.add(mid_a_r)
                     db.session.commit()
+                    query_admin_permission_info(admin_id=admin_id)
                     return api_result(code=201, message='操作成功', data=[])
                 else:
                     ab_code_2(1000001)
@@ -646,8 +559,6 @@ class RoleRelPermissionCrmApi(Resource):
     """
 
     def get(self, role_id):
-        query_admin_permission_info(1)
-
         role_obj = Role.query.get(role_id)
         if role_obj:
             role = role_obj.to_json()
