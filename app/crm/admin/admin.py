@@ -11,7 +11,7 @@ from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, Mi
 
 
 # Todo 用户,角色,权限操作的装饰器
-
+# Todo PUT编辑调用 query_admin_permission_info(admin_id)
 
 def query_admin_permission_info(admin_id):
     """
@@ -88,15 +88,6 @@ def query_admin_permission_info(admin_id):
         return admin_res
     else:
         return admin_res
-
-
-def refresh_cache(admin_id):
-    """
-    更新 Redis 缓存
-    :param admin_id:
-    :return:
-    """
-    return
 
 
 class AdminPageApi(Resource):
@@ -767,7 +758,7 @@ class ApiResourceCrmApi(Resource):
         is_deleted = data.get('is_deleted')
         api_res = ApiResource.query.get(api_resource_id)
         if api_res:
-            api_res.is_deleted = is_deleted if is_deleted == 0 else api_res.id
+            api_res.is_deleted = is_deleted if is_deleted in [0, '0'] else api_res.id
             api_res.modifier = g.app_user.username
             api_res.modifier_id = g.app_user.id
             db.session.commit()
