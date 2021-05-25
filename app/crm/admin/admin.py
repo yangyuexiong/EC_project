@@ -422,7 +422,7 @@ class PermissionCrmApi(Resource):
     GET: 权限详情
     POST: 权限新增
     PUT: 权限编辑
-    DELETE: 权限删除
+    DELETE: 权限(启用/禁用)
     """
 
     def get(self, permission_id):
@@ -477,14 +477,17 @@ class PermissionCrmApi(Resource):
         else:
             ab_code_2(1000001)
 
-    def delete(self, permission_id):
-        permission_obj = Permission.query.get(permission_id)
-        if permission_obj:
-            permission_obj.is_deleted = permission_obj.id
-            permission_obj.modifier = g.app_user.username
-            permission_obj.modifier_id = g.app_user.id
+    def delete(self):
+        data = request.get_json()
+        permission_id = data.get('permission_id')
+        is_deleted = data.get('is_deleted')
+        permission = Permission.query.get(permission_id)
+        if permission:
+            permission.is_deleted = is_deleted if is_deleted in [0, '0'] else permission.id
+            permission.modifier = g.app_user.username
+            permission.modifier_id = g.app_user.id
             db.session.commit()
-            return api_result(code=204, message='操作成功', data=[])
+            return api_result(code=204, message='操作成功')
         else:
             ab_code_2(1000001)
 
