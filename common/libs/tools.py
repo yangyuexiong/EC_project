@@ -291,6 +291,8 @@ class MyPyMysql:
                                 new_r[k] = v
                         except BaseException as e:
                             new_r[k] = v
+                    elif isinstance(v, datetime):
+                        new_r[k] = str(v)
                     else:
                         new_r[k] = v
                 return new_r
