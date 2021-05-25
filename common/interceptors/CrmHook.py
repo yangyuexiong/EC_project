@@ -5,11 +5,13 @@
 # @File    : ApiHook.py
 # @Software: PyCharm
 
+import json
+
 from flask import request, g
 
 from app import crm_bp
 from app.models.admin.models import Admin
-from common.libs.auth import check_user
+from common.libs.auth import check_user, R
 from common.libs.tools import print_logs
 from common.libs.customException import ab_code_2
 
@@ -34,14 +36,14 @@ def before_request_cms():
             # 将 user 存放在全局 g 对象中
             check_user(token=token, model=Admin)
 
-            # Todo
-            """
-            permission_list=[]
-            if request.path in permission_list:
+            admin_id = g.app_user.id
+            admin_role_permission = json.loads(R.get('auth:{}'.format(admin_id)))
+            url_list = admin_role_permission.get('url_list')
+            print(url_list)
+            if request.path in url_list:
                 pass
             else:
-                ab_code_2(403)
-            """
+                ab_code_2(1000000)
         else:
             ab_code_2(666)
 
