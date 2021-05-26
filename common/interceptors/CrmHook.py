@@ -47,7 +47,7 @@ def before_request_cms():
             else:
                 print('无缓存情况')
                 admin = AdminRefreshCache.query_admin_permission_info(admin_id=admin_id)
-                url_list = admin.get('url_list')
+                url_list = admin.get('url_list', [])
                 print(url_list)
             if request.path in url_list:
                 pass

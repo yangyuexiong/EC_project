@@ -27,7 +27,7 @@ api.add_resource(IndexApi, '/', endpoint='api_index')
 """crm"""
 crm_bp = Blueprint('crm', __name__)
 crm_api = Api(crm_bp)
-crm_api.add_resource(IndexCrmApi, '/', endpoint='crm_index')
+crm_api.add_resource(IndexCrmApi, '/index', endpoint='crm_index')
 crm_api.add_resource(TestCrmApi, '/test', endpoint='crm_test')
 crm_api.add_resource(SearchApi, '/search', endpoint='crm_search')
 crm_api.add_resource(LoginCrmApi, '/login', endpoint='crm_login')
