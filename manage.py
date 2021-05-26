@@ -8,7 +8,7 @@
 import os
 import random
 
-from sqlalchemy import or_
+from sqlalchemy import or_, and_
 from flask_script import Manager, Server, Command
 from flask_migrate import Migrate, MigrateCommand
 
@@ -105,8 +105,124 @@ class CRMInit(Command):
                 'name': 'crm测试',
                 'url': '/crm/test',
                 'method': 'GET'
-            }
+            },
+
+            {
+                'name': '用户列表',
+                'url': '/crm/admin/page',
+                'method': 'POST'
+            },
+            {
+                'name': '用户详情',
+                'url': '/crm/admin',
+                'method': 'GET'
+            },
+            {
+                'name': '用户新增',
+                'url': '/crm/admin',
+                'method': 'POST'
+            },
+            {
+                'name': '用户编辑',
+                'url': '/crm/admin',
+                'method': 'PUT'
+            },
+            {
+                'name': '用户(禁用/启用)',
+                'url': '/crm/admin',
+                'method': 'DELETE'
+            },
+            {
+                'name': '用户配置角色',
+                'url': '/crm/admin/rel',
+                'method': 'POST'
+            },
+
+            {
+                'name': '角色列表',
+                'url': '/crm/role/page',
+                'method': 'POST'
+            },
+            {
+                'name': '角色详情',
+                'url': '/crm/role',
+                'method': 'GET'
+            },
+            {
+                'name': '角色新增',
+                'url': '/crm/role',
+                'method': 'POST'
+            },
+            {
+                'name': '角色编辑',
+                'url': '/crm/role',
+                'method': 'PUT'
+            },
+            {
+                'name': '角色(禁用/启用)',
+                'url': '/crm/role',
+                'method': 'DELETE'
+            },
+            {
+                'name': '角色配置权限',
+                'url': '/crm/role/rel',
+                'method': 'POST'
+            },
+
+            {
+                'name': '权限列表',
+                'url': '/crm/permission/page',
+                'method': 'POST'
+            },
+            {
+                'name': '权限详情',
+                'url': '/crm/permission',
+                'method': 'GET'
+            },
+            {
+                'name': '权限新增',
+                'url': '/crm/permission',
+                'method': 'POST'
+            },
+            {
+                'name': '权限编辑',
+                'url': '/crm/permission',
+                'method': 'PUT'
+            },
+            {
+                'name': '权限(禁用/启用)',
+                'url': '/crm/permission',
+                'method': 'DELETE'
+            },
+
+            {
+                'name': '接口列表',
+                'url': '/crm/api_resource/page',
+                'method': 'POST'
+            },
+            {
+                'name': '接口详情',
+                'url': '/crm/api_resource',
+                'method': 'GET'
+            },
+            {
+                'name': '接口新增',
+                'url': '/crm/api_resource',
+                'method': 'POST'
+            },
+            {
+                'name': '接口编辑',
+                'url': '/crm/api_resource',
+                'method': 'PUT'
+            },
+            {
+                'name': '接口(禁用/启用)',
+                'url': '/crm/api_resource',
+                'method': 'DELETE'
+            },
+
         ]
+
         for ad in admin_list:
             print(ad)
             query_admin = Admin.query.filter(
@@ -140,7 +256,10 @@ class CRMInit(Command):
         for api in api_resource:
             name = api.get('name')
             url = api.get('url')
-            query_api = ApiResource.query.filter(or_(ApiResource.name == name, ApiResource.url == url)).first()
+            method = api.get('method')
+            query_api = ApiResource.query.filter(
+                ApiResource.name == name,
+                and_(ApiResource.url == url, ApiResource.method == method)).first()
             if query_api:
                 print('CRM Api: {} 已存在'.format(query_api))
             else:
