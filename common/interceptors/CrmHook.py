@@ -14,6 +14,7 @@ from app.models.admin.models import Admin
 from common.libs.auth import check_user, R
 from common.libs.tools import print_logs
 from common.libs.customException import ab_code_2
+from common.libs.utils import AdminRefreshCache
 
 
 @crm_bp.before_request
@@ -37,12 +38,21 @@ def before_request_cms():
             check_user(token=token, model=Admin)
 
             admin_id = g.app_user.id
-            admin_role_permission = json.loads(R.get('auth:{}'.format(admin_id)))
-            url_list = admin_role_permission.get('url_list')
-            print(url_list)
+            admin_auth_result = R.get('auth:{}'.format(admin_id))
+            if admin_auth_result:
+                print('Redis缓存情况')
+                admin_role_permission = json.loads(admin_auth_result)
+                url_list = admin_role_permission.get('url_list')
+                print(url_list)
+            else:
+                print('无缓存情况')
+                admin = AdminRefreshCache.query_admin_permission_info(admin_id=admin_id)
+                url_list = admin.get('url_list')
+                print(url_list)
             if request.path in url_list:
                 pass
             else:
+                # pass
                 ab_code_2(1000000)
         else:
             ab_code_2(666)
