@@ -49,6 +49,7 @@ def before_request_cms():
                 admin = AdminRefreshCache.query_admin_permission_info(admin_id=admin_id)
                 url_list = admin.get('url_list', [])
                 print(url_list)
+                # Todo 按照 method 进行区分相同接口再判断是否有该权限
             if request.path in url_list:
                 pass
             else:
