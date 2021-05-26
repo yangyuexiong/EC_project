@@ -223,6 +223,7 @@ class CRMInit(Command):
 
         ]
 
+        # 创建用户
         for ad in admin_list:
             print(ad)
             query_admin = Admin.query.filter(
@@ -243,6 +244,7 @@ class CRMInit(Command):
                 db.session.commit()
                 print('CRM用户: {} 添加成功'.format(admin))
 
+        # 创建角色
         for role in role_list:
             query_role = Role.query.filter_by(name=role).first()
             if query_role:
@@ -253,13 +255,12 @@ class CRMInit(Command):
                 db.session.commit()
                 print('CRM角色: {} 添加成功'.format(role))
 
+        # 创建权限
         for api in api_resource:
             name = api.get('name')
             url = api.get('url')
             method = api.get('method')
-            query_api = ApiResource.query.filter(
-                ApiResource.name == name,
-                and_(ApiResource.url == url, ApiResource.method == method)).first()
+            query_api = ApiResource.query.filter(and_(ApiResource.url == url, ApiResource.method == method)).first()
             if query_api:
                 print('CRM Api: {} 已存在'.format(query_api))
             else:
@@ -290,6 +291,46 @@ class CRMInit(Command):
                     db.session.add(permission)
                     db.session.commit()
                     print('CRM 权限 创建完成:{}'.format(name))
+
+        # 为admin设置所有角色权限
+        root_admin = Admin.query.filter_by(username='admin').first()
+        super_role = Role.query.filter_by(name='超级管理员').first()
+        all_role = Role.query.all()
+        all_permission = Permission.query.all()
+
+        # 配置权限
+        for per in all_permission:
+            query_mid_permission_role = MidPermissionAndRole.query.filter_by(
+                role_id=super_role.id,
+                permission_id=per.id).first()
+            if query_mid_permission_role:
+                print('角色:{} 已拥有权限:{}'.format(super_role.name, per.name))
+            else:
+                mid_permission_role = MidPermissionAndRole(
+                    permission_id=per.id,
+                    role_id=super_role.id,
+                    creator='shell',
+                    creator_id='0'
+                )
+                db.session.add(mid_permission_role)
+                print('角色:{} 添加 权限:{} 完成'.format(super_role.name, per.name))
+        db.session.commit()
+
+        # 配置角色
+        for role in all_role:
+            query_mid_admin_role = MidAdminAndRole.query.filter_by(admin_id=root_admin.id, role_id=role.id).first()
+            if query_mid_admin_role:
+                print('用户:{} 已拥有角色:{}'.format(root_admin.username, role.name))
+            else:
+                mid_admin_role = MidAdminAndRole(
+                    admin_id=root_admin.id,
+                    role_id=role.id,
+                    creator='shell',
+                    creator_id='0'
+                )
+                db.session.add(mid_admin_role)
+                print('用户:{} 添加 角色:{} 完成'.format(root_admin.username, role.name))
+        db.session.commit()
 
 
 class CommodityInit(Command):
