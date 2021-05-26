@@ -13,11 +13,11 @@ from common.libs.BaseModel import *
 class Admin(BaseModel):
     __tablename__ = 'ec_crm_admin'
     __table_args__ = {'comment': '后台用户表'}
-    username = db.Column(db.String(50), nullable=False, comment='用户名称')
+    username = db.Column(db.String(50), nullable=False, unique=True, comment='用户名称')
     _password = db.Column(db.String(100), nullable=False, comment='用户密码')
-    phone = db.Column(db.String(64), comment='手机号')
+    phone = db.Column(db.String(64), unique=True, comment='手机号')
     mail = db.Column(db.String(128), comment='邮箱')
-    code = db.Column(db.String(64), comment='用户编号')
+    code = db.Column(db.String(64), unique=True, comment='用户编号')
     creator = db.Column(db.String(32), comment='创建人')
     creator_id = db.Column(BIGINT(20, unsigned=True), comment='创建人id')
     modifier = db.Column(db.String(32), comment='更新人')
@@ -35,23 +35,6 @@ class Admin(BaseModel):
     def check_password(self, raw_password):
         result = check_password_hash(self.password, raw_password)
         return result
-
-    def get_role(self):
-        """获取当前用户的所有角色"""
-        roles = self.roles
-        # print(roles)
-        roles_json = [r.to_json() for r in roles]
-        return roles_json
-
-    def get_permission(self):
-        """获取当前用户的所有权限"""
-        roles = self.roles
-        permission_set = []
-        for r in roles:
-            permission_set += r.permission_list
-        # print(list(set(permission_set)))
-        permission_json = [p.to_json() for p in list(set(permission_set))]
-        return permission_json
 
     def __repr__(self):
         return 'Admin 模型对象-> ID:{} 用户名:{}'.format(self.id, self.username)

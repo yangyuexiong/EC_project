@@ -8,6 +8,7 @@
 import os
 import random
 
+from sqlalchemy import or_
 from flask_script import Manager, Server, Command
 from flask_migrate import Migrate, MigrateCommand
 
@@ -62,28 +63,114 @@ class CRMInit(Command):
     """CRM初始化"""
 
     def run(self):
-        try:
-            user = Admin.query.filter_by(username='admin').first()
-            if user:
-                pass
-            else:
-                user = Admin(username='admin', password='123456')
-                db.session.add(user)
-                db.session.commit()
-                print('cms用户添加成功')
-            for r in range(1, 5):
-                role_obj = Role(name='角色{}'.format(str(r)))
-                db.session.add(role_obj)
-            db.session.commit()
-            print('cms角色添加成功')
 
-            for p in range(1, 5):
-                permission_obj = Permission(name='权限{}'.format(str(p)))
-                db.session.add(permission_obj)
-            db.session.commit()
-            print('cms权限添加成功')
-        except BaseException as e:
-            print('出错:{}'.format(str(e)))
+        admin = {
+            'username': 'admin',
+            'password': '123456',
+            'phone': '15013038819',
+            'mail': 'yangyuexiong33@gmail.com',
+            'code': '00001'
+        }
+        admin2 = {
+            'username': 'admin2',
+            'password': '123456',
+            'phone': '15013038818',
+            'mail': 'yangyuexiong33@gmail.com',
+            'code': '00002'
+        }
+        admin3 = {
+            'username': 'admin3',
+            'password': '123456',
+            'phone': '15013038817',
+            'mail': 'yangyuexiong33@gmail.com',
+            'code': '00003'
+        }
+        admin4 = {
+            'username': 'admin4',
+            'password': '123456',
+            'phone': '15013038816',
+            'mail': 'yangyuexiong33@gmail.com',
+            'code': '00004'
+        }
+
+        admin_list = [admin, admin2, admin3, admin4]
+        role_list = ['超级管理员', '管理员A', '管理员B', '管理员C', '管理员D']
+        api_resource = [
+            {
+                'name': 'crm首页',
+                'url': '/crm/index',
+                'method': 'GET'
+            },
+            {
+                'name': 'crm测试',
+                'url': '/crm/test',
+                'method': 'GET'
+            }
+        ]
+        for ad in admin_list:
+            print(ad)
+            query_admin = Admin.query.filter(
+                or_(Admin.username == ad.get('username'), Admin.phone == ad.get('phone'))).first()
+            if query_admin:
+                print('CRM用户: {} 已存在'.format(query_admin))
+            else:
+                new_admin = Admin(
+                    username=ad.get('username'),
+                    password=ad.get('password'),
+                    phone=ad.get('phone'),
+                    mail=ad.get('mail'),
+                    code=ad.get('code'),
+                    creator='shell',
+                    creator_id='0',
+                    remark='manage shell')
+                db.session.add(new_admin)
+                db.session.commit()
+                print('CRM用户: {} 添加成功'.format(admin))
+
+        for role in role_list:
+            query_role = Role.query.filter_by(name=role).first()
+            if query_role:
+                print('CRM角色: {} 已存在'.format(query_role))
+            else:
+                new_role = Role(name=role, creator='shell', creator_id='0', remark='manage shell')
+                db.session.add(new_role)
+                db.session.commit()
+                print('CRM角色: {} 添加成功'.format(role))
+
+        for api in api_resource:
+            name = api.get('name')
+            url = api.get('url')
+            query_api = ApiResource.query.filter(or_(ApiResource.name == name, ApiResource.url == url)).first()
+            if query_api:
+                print('CRM Api: {} 已存在'.format(query_api))
+            else:
+                api_resource = ApiResource(
+                    name=name,
+                    url=url,
+                    method=api.get('method'),
+                    creator='shell',
+                    creator_id='0',
+                    remark='manage shell'
+                )
+                db.session.add(api_resource)
+                db.session.commit()
+                print('CRM Api 创建完成:{}'.format(name))
+
+                query_permission = Permission.query.filter_by(name=name).first()
+                if query_permission:
+                    print('CRM 权限: {} 已存在'.format(query_permission))
+                else:
+                    permission = Permission(
+                        name=name,
+                        resource_id=api_resource.id,
+                        resource_type='SERVER_API',
+                        creator='shell',
+                        creator_id='0',
+                        remark='manage shell'
+                    )
+                    db.session.add(permission)
+                    db.session.commit()
+                    print('CRM 权限 创建完成:{}'.format(name))
 
 
 class CommodityInit(Command):
