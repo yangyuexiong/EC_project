@@ -49,7 +49,7 @@ class AdminRefreshCache:
             SELECT 
             id,username,phone,mail,code,creator,modifier,create_time,update_time,is_deleted,status,remark 
             FROM ec_crm_admin 
-            WHERE id={};""".format(admin_id)
+            WHERE is_deleted=0 and id={};""".format(admin_id)
         admin_res = project_db.select(query_admin, only=True)
         print(query_admin)
         # print(admin_res)
@@ -59,59 +59,70 @@ class AdminRefreshCache:
             SELECT 
             id,name,creator,modifier,create_time,update_time,is_deleted,status,remark 
             FROM ec_crm_role 
-            WHERE id in (SELECT role_id FROM ec_crm_mid_admin_role WHERE admin_id={});""".format(admin_id)
+            WHERE is_deleted=0 and id in (SELECT role_id FROM ec_crm_mid_admin_role WHERE admin_id={});""".format(
+                admin_id)
             role_res = project_db.select(query_role)
             print(query_role)
             # print(role_res)
+            if role_res:
+                role_id_list = [r_id.get('id') for r_id in role_res]
+                # print(tuple(role_id_list))
 
-            role_id_list = [r_id.get('id') for r_id in role_res]
-            # print(tuple(role_id_list))
+                to_role_id_list = str(tuple(role_id_list)).replace(',', '') if len(role_id_list) == 1 else tuple(
+                    role_id_list)
+                # print(to_role_id_list)
 
-            query_permission = """
-            SELECT 
-            P.id,
-            P.name,
-            P.resource_id,
-            P.resource_type,
-            API.name,
-            API.url,
-            API.method,
-            P.is_deleted,
-            P.creator,
-            P.modifier,
-            P.create_time,
-            P.update_time,
-            P.remark,
-            API.remark
-            FROM ec_crm_permission P LEFT JOIN ec_crm_api_resource API ON P.resource_id=API.id  
-            WHERE P.id in (SELECT permission_id FROM ec_crm_mid_permission_role WHERE role_id in {});
-            """.format(tuple(role_id_list))
-            permission_res = project_db.select(query_permission)
-            print(query_permission)
-            # print(permission_res)
-            url_list = []
-            route_list = []
-            other_list = []
-            for p in permission_res:
-                url = p.get('url')
-                resource_type = p.get('resource_type')
-                if resource_type == 'SERVER_API':
-                    url_list.append(url)
-                elif resource_type == 'WEB_ROUTE':
-                    route_list.append(url)
+                query_permission = """
+                SELECT 
+                P.id,
+                P.name,
+                P.resource_id,
+                P.resource_type,
+                API.name,
+                API.url,
+                API.method,
+                P.is_deleted,
+                P.creator,
+                P.modifier,
+                P.create_time,
+                P.update_time,
+                P.remark,
+                API.remark
+                FROM ec_crm_permission P LEFT JOIN ec_crm_api_resource API ON P.resource_id=API.id  
+                WHERE P.is_deleted=0 and P.id in (SELECT permission_id FROM ec_crm_mid_permission_role WHERE role_id in {});
+                """.format(to_role_id_list)
+                permission_res = project_db.select(query_permission)
+                print(query_permission)
+                # print(permission_res)
+
+                if permission_res:
+                    url_list = []
+                    route_list = []
+                    other_list = []
+                    for p in permission_res:
+                        url = p.get('url')
+                        resource_type = p.get('resource_type')
+                        if resource_type == 'SERVER_API':
+                            url_list.append(url)
+                        elif resource_type == 'WEB_ROUTE':
+                            route_list.append(url)
+                        else:
+                            other_list.append(url)
+
+                    admin_res['role_list'] = role_res
+                    admin_res['role_id_list'] = role_id_list
+                    admin_res['permission_list'] = permission_res
+                    admin_res['url_list'] = url_list
+                    admin_res['route_list'] = route_list
+                    admin_res['other_list'] = other_list
+
+                    redis_key = 'auth:{}'.format(admin_id)
+                    R.set(redis_key, json.dumps(admin_res))
+                    return admin_res
                 else:
-                    other_list.append(url)
-
-            admin_res['role_list'] = role_res
-            admin_res['role_id_list'] = role_id_list
-            admin_res['permission_list'] = permission_res
-            admin_res['url_list'] = url_list
-            admin_res['route_list'] = route_list
-            admin_res['other_list'] = other_list
-
-            redis_key = 'auth:{}'.format(admin_id)
-            R.set(redis_key, json.dumps(admin_res))
-            return admin_res
+                    return admin_res
+            else:
+                return admin_res
         else:
             return admin_res
 
