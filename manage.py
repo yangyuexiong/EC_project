@@ -333,64 +333,6 @@ class CRMInit(Command):
         db.session.commit()
 
 
-class CommodityInit(Command):
-    """商品Demo"""
-
-    def run(self):
-        try:
-
-            c1 = ProductCategory(name='商品分类A')
-            c2 = ProductCategory(name='商品分类B')
-            c3 = ProductCategory(name='商品分类c')
-            db.session.add_all([c1, c2, c3])
-            db.session.commit()
-
-            c1_id = c1.id
-            c2_id = c2.id
-            c3_id = c3.id
-
-            for i in range(0, 9):
-                cd = Product(
-                    prod_category_id=random.choice([c1_id, c2_id, c3_id]),
-                    name='商品:{}'.format(i),
-                    summary='商品简介:{}'.format(i),
-                    price=i
-                )
-                db.session.add(cd)
-                db.session.commit()
-
-            ak1 = AttributeKey(name='颜色')
-            ak2 = AttributeKey(name='内存')
-            ak3 = AttributeKey(name='版本')
-            db.session.add_all([ak1, ak2, ak3])
-            db.session.commit()
-
-            ak1_id = ak1.id
-            ak2_id = ak2.id
-            ak3_id = ak3.id
-
-            av_list = [
-                AttributeVal(attr_key_id=ak1_id, name='红色'),
-                AttributeVal(attr_key_id=ak1_id, name='蓝色'),
-                AttributeVal(attr_key_id=ak1_id, name='绿色'),
-                AttributeVal(attr_key_id=ak2_id, name='128G'),
-                AttributeVal(attr_key_id=ak2_id, name='256G'),
-                AttributeVal(attr_key_id=ak2_id, name='512G'),
-                AttributeVal(attr_key_id=ak3_id, name='v1.0'),
-                AttributeVal(attr_key_id=ak3_id, name='v2.0'),
-                AttributeVal(attr_key_id=ak3_id, name='v3.0'),
-                AttributeVal(attr_key_id=ak3_id, name='v4.0'),
-                AttributeVal(attr_key_id=ak3_id, name='v5.0'),
-                AttributeVal(attr_key_id=ak3_id, name='v6.0')
-            ]
-            for av in av_list:
-                db.session.add(av)
-            db.session.commit()
-
-        except BaseException as e:
-            print(str(e))
-
-
 class SkuInit(Command):
     """Sku Demo"""
 
@@ -418,87 +360,11 @@ class SkuInit(Command):
         db.session.commit()
 
 
-class CrmAdmin(Command):
-
-    def run(self):
-        if Admin.query.filter_by(username='yangyuexiong', is_deleted=0).first():
-            raise ValueError('yangyuexiong 已经存在')
-        else:
-            admin = Admin(
-                username='yangyuexiong',
-                password='123456',
-                phone='15013038819',
-                mail='yangyuexiong33@gmail.com',
-                code='00001',
-                creator='shell',
-                creator_id='0',
-                remark='manage shell'
-            )
-            db.session.add(admin)
-            db.session.commit()
-            print('admin 创建完成')
-
-        if Role.query.filter_by(name='超级管理员', is_deleted=0).first():
-            raise ValueError('超级管理员 已经存在')
-        else:
-            role = Role(name='超级管理员', creator='shell', creator_id='0', remark='manage shell')
-            db.session.add(role)
-            db.session.commit()
-            print('role 创建完成')
-
-        api_resource = ApiResource(
-            name='crm首页',
-            url='/crm/index',
-            method='GET',
-            creator='shell',
-            creator_id='0',
-            remark='manage shell'
-        )
-        db.session.add(api_resource)
-        db.session.commit()
-        print('api_resource 创建完成')
-
-        permission = Permission(
-            name='yyx',
-            resource_id=api_resource.id,
-            resource_type='SERVER_API',
-            creator='shell',
-            creator_id='0',
-            remark='manage shell'
-        )
-        db.session.add(permission)
-        db.session.commit()
-        print('permission 创建完成')
-
-        mid_admin_role = MidAdminAndRole(
-            admin_id=admin.id,
-            role_id=role.id,
-            creator='shell',
-            creator_id='0',
-            remark='manage shell'
-        )
-        db.session.add(mid_admin_role)
-        db.session.commit()
-        print('mid_admin_role 创建完成')
-
-        mid_permission_role = MidPermissionAndRole(
-            permission_id=permission.id,
-            role_id=role.id,
-            creator='shell',
-            creator_id='0',
-            remark='manage shell'
-        )
-        db.session.add(mid_permission_role)
-        db.session.commit()
-        print('mid_permission_role 创建完成')
-
-
 # 添加命令
 manager.add_command('hello', Hello())
 manager.add_command('orm', TableCreateFirst())
 manager.add_command('table', TableCreate())
 manager.add_command('crm', CRMInit())
-manager.add_command('admin', CrmAdmin())
 
 
 @manager.option('-u', '--username', dest='username')
