@@ -6,7 +6,6 @@
 # @Software: PyCharm
 
 import json
-import time
 import decimal
 from datetime import datetime
 
@@ -63,12 +62,6 @@ def json_format(d):
         print(d)
 
 
-def gen_order_number():
-    """生成订单号"""
-    order_no = str(time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))) + str(time.time()).replace('.', '')
-    return order_no
-
-
 def general_paging_fuzzy_query(q, model, like_params, where_dict, page=1, size=20):
     """
     通用分页模糊查询(单表)
@@ -101,20 +94,6 @@ def general_paging_fuzzy_query(q, model, like_params, where_dict, page=1, size=2
 
     result_list = [i.to_json() for i in pagination.items]
     return result_list
-
-
-def page_size(page=None, size=None, **kwargs):
-    """
-
-    :param page: -> int
-    :param size: -> int
-    :param kwargs: {"page":1,"size":20}
-    :return:
-    """
-    page = page if page and isinstance(page, int) else int(kwargs.get('page', 0))
-    size = size if size and isinstance(size, int) else int(kwargs.get('size', 20))
-    page = (page - 1) * size if page != 0 else 0
-    return page, size
 
 
 class MyPyMysql:
