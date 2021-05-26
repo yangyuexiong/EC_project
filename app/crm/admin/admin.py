@@ -660,15 +660,20 @@ class ApiResourceCrmApi(Resource):
         url = data.get('url')
         method = data.get('method')
         remark = data.get('remark')
-        if name and url:
-            api_res = ApiResource.query.filter(or_(ApiResource.name == name, ApiResource.url == url)).first()
-            if name and url and not api_res:
-                new_api_res = ApiResource(name=name, url=url, method=method, remark=remark)
+        if name and url and method:
+            api_query = ApiResource.query.filter(and_(ApiResource.url == url, ApiResource.method == method)).first()
+            if not api_query:
+                new_api_res = ApiResource(
+                    name=name, url=url, method=method,
+                    creator=g.app_user.username,
+                    creator_id=g.app_user.id,
+                    remark=remark
+                )
                 db.session.add(new_api_res)
                 db.session.commit()
                 return api_result(code=201, message='操作成功')
             else:
-                return api_result(code=200, message='接口或名称已经存在')
+                return api_result(code=200, message='{}:{} 已经存在'.format(method, url))
         else:
             ab_code_2(1000001)
 
@@ -679,9 +684,9 @@ class ApiResourceCrmApi(Resource):
         url = data.get('url')
         method = data.get('method')
         remark = data.get('remark')
-        if name and url:
+        if name and url and method:
             api_res = ApiResource.query.get(api_resource_id)
-            api_query = ApiResource.query.filter(or_(ApiResource.name == name, ApiResource.url == url)).first()
+            api_query = ApiResource.query.filter(and_(ApiResource.url == url, ApiResource.method == method)).first()
             if api_res and not api_query:
                 api_res.name = name
                 api_res.url = url
@@ -694,7 +699,7 @@ class ApiResourceCrmApi(Resource):
                 AdminRefreshCache.refresh()
                 return api_result(code=203, message='操作成功')
             else:
-                return api_result(code=200, message='接口或名称已经存在')
+                return api_result(code=200, message='{}:{} 已经存在'.format(method, url))
         else:
             ab_code_2(1000001)
 
