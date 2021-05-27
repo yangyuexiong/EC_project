@@ -87,7 +87,7 @@ class AdminCrmApi(Resource):
         admin_boj = Admin.query.get(admin_id)
         if admin_boj:
             admin = admin_boj.to_json(*['_password'])
-            query_admin_role_permission(admin_id)
+            AdminRefreshCache.query_admin_permission_info(admin_id=admin_id)
             return api_result(code=200, message='操作成功', data=admin)
         else:
             ab_code_2(1000001)
