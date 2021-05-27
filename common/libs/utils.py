@@ -81,6 +81,7 @@ class AdminRefreshCache:
                 API.name,
                 API.url,
                 API.method,
+                API.is_url_var,
                 P.is_deleted,
                 P.creator,
                 P.modifier,
@@ -97,13 +98,24 @@ class AdminRefreshCache:
 
                 if permission_res:
                     url_list = []
+                    url_is_var_list = []
+                    url_tuple_list = []
+                    url_is_var_tuple_list = []
                     route_list = []
                     other_list = []
                     for p in permission_res:
+                        method = p.get('method')
                         url = p.get('url')
+                        is_url_var = p.get('is_url_var')
                         resource_type = p.get('resource_type')
                         if resource_type == 'SERVER_API':
-                            url_list.append(url)
+                            t = (method, url)
+                            if bool(is_url_var):
+                                url_is_var_list.append(url)
+                                url_is_var_tuple_list.append(t)
+                            else:
+                                url_list.append(url)
+                                url_tuple_list.append(t)
                         elif resource_type == 'WEB_ROUTE':
                             route_list.append(url)
                         else:
@@ -113,6 +125,9 @@ class AdminRefreshCache:
                     admin_res['role_id_list'] = role_id_list
                     admin_res['permission_list'] = permission_res
                     admin_res['url_list'] = url_list
+                    admin_res['url_is_var_list'] = url_is_var_list
+                    admin_res['url_tuple_list'] = url_tuple_list
+                    admin_res['url_is_var_tuple_list'] = url_is_var_tuple_list
                     admin_res['route_list'] = route_list
                     admin_res['other_list'] = other_list
 

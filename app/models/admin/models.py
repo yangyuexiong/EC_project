@@ -116,6 +116,8 @@ class ApiResource(BaseModel):
     __table_args__ = {'comment': 'Api资源表'}
     name = db.Column(db.String(64), nullable=False, comment='Api名称')
     url = db.Column(db.String(128), comment='接口地址')
+    uri = db.Column(db.String(128), comment='参数:如 /api/{id};备用字段')
+    is_url_var = db.Column(TINYINT(1, unsigned=True), server_default=text('0'), comment='url是否拼接参数:如 /api/{id};0-否;1-是')
     method = db.Column(db.String(128), comment='Https Method 1-GET;2-POST;3-PUT;4-DELETE;5-PATCH')
     creator = db.Column(db.String(32), comment='创建人')
     creator_id = db.Column(BIGINT(20, unsigned=True), comment='创建人id')

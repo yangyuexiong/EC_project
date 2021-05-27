@@ -5,6 +5,7 @@
 # @File    : ApiHook.py
 # @Software: PyCharm
 
+import re
 import json
 
 from flask import request, g
@@ -43,17 +44,42 @@ def before_request_cms():
                 print('Redis缓存情况')
                 admin_role_permission = json.loads(admin_auth_result)
                 url_list = admin_role_permission.get('url_list')
+                url_is_var_list = admin_role_permission.get('url_is_var_list')
+                url_tuple_list = [tuple(t) for t in admin_role_permission.get('url_tuple_list')]
+                url_is_var_tuple_list = [tuple(t) for t in admin_role_permission.get('url_is_var_tuple_list')]
                 print(url_list)
+                print(url_is_var_list)
+                print('==========')
+                print(url_tuple_list)
+                print(url_is_var_tuple_list)
+
             else:
                 print('无缓存情况')
                 admin = AdminRefreshCache.query_admin_permission_info(admin_id=admin_id)
                 url_list = admin.get('url_list', [])
+                url_is_var_list = admin.get('url_is_var_list', [])
+                url_tuple_list = admin.get('url_tuple_list', [])
+                url_is_var_tuple_list = admin.get('url_is_var_tuple_list', [])
                 print(url_list)
-                # Todo 按照 method 进行区分相同接口再判断是否有该权限
-            if request.path in url_list:
-                pass
+                print(url_is_var_list)
+                print('==========')
+                print(url_tuple_list)
+                print(url_is_var_tuple_list)
+
+            req_tuple = (request.method, request.path)
+            print(req_tuple)
+
+            pattern = '|'.join(['^{}/\w+'.format(is_var_url[1]) for is_var_url in url_is_var_tuple_list])
+            print(pattern)
+            re_result = re.search(pattern, request.path)
+            print(re_result)
+            print(bool(re_result))
+
+            if req_tuple in url_tuple_list:
+                return
+            elif bool(re_result):
+                return
             else:
-                # pass
                 ab_code_2(1000000)
         else:
             ab_code_2(666)
