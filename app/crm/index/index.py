@@ -14,4 +14,5 @@ class IndexCrmApi(Resource):
     """
 
     def get(self):
+        print(request.args.get('test'))
         return api_result(code=200, message='crm index')
