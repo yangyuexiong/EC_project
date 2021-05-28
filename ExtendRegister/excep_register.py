@@ -13,29 +13,29 @@ from werkzeug.exceptions import HTTPException
 from app import api_bp
 from common.libs.customException import CustomException
 from common.libs.api_result import api_result
-from common.libs.tools import print_logs
+from common.libs.tools import print_logs, logger
 
 
 @api_bp.app_errorhandler(Exception)
 def errors(e):
-    print('异常:{}'.format(e))
-    print('异常类型:{}'.format(type(e)))
+    logger.error('异常:{}'.format(e))
+    logger.error('异常类型:{}'.format(type(e)))
 
     data = request.method + ' ' + request.path
     if isinstance(e, CustomException):
-        print('-----CustomException-----')
+        logger.error('-----CustomException-----')
         print_logs()
         traceback.print_exc()
         return api_result(code=e.code, message='CustomException:【{}】'.format(str(e.msg)), data=data)
 
     elif isinstance(e, HTTPException) and (300 <= e.code < 600):
-        print('-----HTTPException-----')
+        logger.error('-----HTTPException-----')
         print_logs()
         traceback.print_exc()
         return api_result(code=e.code, message='HTTPException:【{}】'.format(str(e)), data=data)
 
     else:
-        print('-----Exception-----')
+        logger.error('-----Exception-----')
         print_logs()
         traceback.print_exc()
         return api_result(code=500, message='Exception:【{}】'.format(str(e)), data=data)

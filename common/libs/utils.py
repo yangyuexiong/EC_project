@@ -9,7 +9,7 @@ import json
 import time
 
 from common.libs.auth import R
-from common.libs.tools import project_db
+from common.libs.tools import project_db, logger
 from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, MidPermissionAndRole, ApiResource
 
 
@@ -51,7 +51,7 @@ class AdminRefreshCache:
             FROM ec_crm_admin 
             WHERE is_deleted=0 and id={};""".format(admin_id)
         admin_res = project_db.select(query_admin, only=True)
-        print(query_admin)
+        logger.success(query_admin)
         # print(admin_res)
 
         if admin_res:
@@ -62,7 +62,7 @@ class AdminRefreshCache:
             WHERE is_deleted=0 and id in (SELECT role_id FROM ec_crm_mid_admin_role WHERE admin_id={});""".format(
                 admin_id)
             role_res = project_db.select(query_role)
-            print(query_role)
+            logger.success(query_role)
             # print(role_res)
             if role_res:
                 role_id_list = [r_id.get('id') for r_id in role_res]
@@ -93,7 +93,7 @@ class AdminRefreshCache:
                 WHERE P.is_deleted=0 and P.id in (SELECT permission_id FROM ec_crm_mid_permission_role WHERE role_id in {});
                 """.format(to_role_id_list)
                 permission_res = project_db.select(query_permission)
-                print(query_permission)
+                logger.success(query_permission)
                 # print(permission_res)
 
                 if permission_res:
@@ -186,7 +186,7 @@ class AdminRefreshCache:
         :param args:
         :return:
         """
-        print('===refresh===')
+        logger.success('===refresh===')
 
         if args:
             [cls.query_admin_permission_info(admin_id=admin_id) for admin_id in args]

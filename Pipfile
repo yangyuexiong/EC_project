@@ -12,6 +12,7 @@ redis = "*"
 flask-script = "*"
 flask-migrate = "*"
 pymysql = "*"
+loguru = "*"
 
 [dev-packages]
 
