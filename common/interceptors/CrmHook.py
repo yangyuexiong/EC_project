@@ -69,13 +69,11 @@ def before_request_cms():
             req_tuple = (request.method, request.path)
             print(req_tuple)
 
-            pattern = '|'.join(['^{}/\w+'.format(is_var_url[1]) for is_var_url in url_is_var_tuple_list])
+            pattern = '|'.join(['^{}/\w+$'.format(is_var_url[1]) for is_var_url in url_is_var_tuple_list])
             print(pattern)
             re_result = re.search(pattern, request.path)
             print(re_result)
             print(bool(re_result))
-
-            # Todo 多级url中包含相同uri无法识别
 
             if req_tuple in url_tuple_list:
                 return
