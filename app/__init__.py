@@ -18,6 +18,7 @@ from .crm.admin.admin import AdminPageApi, AdminCrmApi, RolePageApi, RoleCrmApi,
 from .crm.login.login import LoginCrmApi
 from .crm.product.product import ProductCrmApi
 from .crm.sku.sku import SkuApi, SkuPageApi
+from .crm.order.order import OrderCrmApi
 
 """front"""
 api_bp = Blueprint('api', __name__)
@@ -49,3 +50,5 @@ crm_api.add_resource(SkuPageApi, '/sku/page', endpoint='crm_sku_page')
 
 crm_api.add_resource(ApiResourceCrmApi, '/api_resource', '/api_resource/<api_resource_id>', endpoint='crm_api_resource')
 crm_api.add_resource(ApiResourcePageCrmApi, '/api_resource/page', endpoint='crm_api_resource_page')
+
+crm_api.add_resource(OrderCrmApi, '/order', '/order/<order_id>', endpoint='crm_order')
