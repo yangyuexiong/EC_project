@@ -83,7 +83,7 @@ def before_request_cms():
 
             if req_tuple in url_tuple_list:
                 return
-            elif bool(re_result):
+            elif url_is_var_tuple_list and bool(re_result):
                 return
             else:
                 ab_code_2(1000000)

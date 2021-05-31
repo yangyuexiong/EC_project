@@ -122,7 +122,8 @@ def register_commands(app):
             {
                 'name': '用户详情',
                 'url': '/crm/admin',
-                'method': 'GET'
+                'method': 'GET',
+                'is_url_var': '1'
             },
             {
                 'name': '用户新增',
@@ -153,7 +154,8 @@ def register_commands(app):
             {
                 'name': '角色详情',
                 'url': '/crm/role',
-                'method': 'GET'
+                'method': 'GET',
+                'is_url_var': '1'
             },
             {
                 'name': '角色新增',
@@ -184,7 +186,8 @@ def register_commands(app):
             {
                 'name': '权限详情',
                 'url': '/crm/permission',
-                'method': 'GET'
+                'method': 'GET',
+                'is_url_var': '1'
             },
             {
                 'name': '权限新增',
@@ -210,7 +213,8 @@ def register_commands(app):
             {
                 'name': '接口详情',
                 'url': '/crm/api_resource',
-                'method': 'GET'
+                'method': 'GET',
+                'is_url_var': '1'
             },
             {
                 'name': '接口新增',
@@ -275,6 +279,7 @@ def register_commands(app):
                     name=name,
                     url=url,
                     method=api.get('method'),
+                    is_url_var=api.get('is_url_var'),
                     creator='shell',
                     creator_id='0',
                     remark='manage shell'
