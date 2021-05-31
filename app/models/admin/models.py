@@ -13,8 +13,8 @@ from common.libs.BaseModel import *
 class Admin(BaseModel):
     __tablename__ = 'ec_crm_admin'
     __table_args__ = {'comment': '后台用户表'}
-    username = db.Column(db.String(50), nullable=False, unique=True, comment='用户名称')
-    _password = db.Column(db.String(100), nullable=False, comment='用户密码')
+    username = db.Column(db.String(32), nullable=False, unique=True, comment='用户名称')
+    _password = db.Column(db.String(256), nullable=False, comment='用户密码')
     phone = db.Column(db.String(64), unique=True, comment='手机号')
     mail = db.Column(db.String(128), comment='邮箱')
     code = db.Column(db.String(64), unique=True, comment='用户编号')
