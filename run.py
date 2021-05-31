@@ -6,7 +6,6 @@
 # @Software: PyCharm
 
 import os
-import warnings
 import platform
 import threading
 import datetime
