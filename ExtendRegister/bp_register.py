@@ -8,6 +8,15 @@
 
 from app import api_bp, crm_bp
 
+from flask import Blueprint
+
+other_module = Blueprint('other_module', __name__)
+
+
+@other_module.route('/', methods=["GET", "POST"])
+async def module_01():
+    return '其他业务模块001'
+
 
 def register_bp(app):
     """蓝图注册"""
@@ -19,4 +28,4 @@ def register_bp(app):
     app.register_blueprint(crm_bp, url_prefix="/crm")
 
     """其他独立蓝图注册"""
-    pass
+    app.register_blueprint(other_module, url_prefix="/m1")
