@@ -53,6 +53,30 @@ class Order(BaseModel):
             self.id, self.order_number, self.user_id
         )
 
-# class OrderItem(BaseModel):
-#     __tablename__ = 'ec_order_item'
-#     __table_args__ = {'comment': '订单商品信息表'}
+
+class OrderItem(BaseModel):
+    __tablename__ = 'ec_order_item'
+    __table_args__ = {'comment': '订单商品信息表'}
+    user_id = db.Column(BIGINT(20, unsigned=True), comment='用户id')
+    order_id = db.Column(BIGINT(20, unsigned=True), comment='订单id')
+    order_number = db.Column(db.String(128), comment='订单号')
+    product_quantity = db.Column(BIGINT(20, unsigned=True), comment='购买数量')
+    product_category_id = db.Column(BIGINT(20, unsigned=True), comment='商品分类id')
+    product_brand = db.Column(db.String(128), unique=True, comment='商品品牌')
+    product_id = db.Column(BIGINT(20, unsigned=True), comment='商品id')
+    product_name = db.Column(db.String(128), comment='商品名称')
+    product_pic = db.Column(db.String(1024), comment='商品图片')
+    product_sku_id = db.Column(BIGINT(20, unsigned=True), comment='商品sku编号')
+    product_sku_spec = db.Column(db.JSON, comment='商品规格Json')
+    product_price = db.Column(db.DECIMAL(10, 2), comment='销售价格')
+    real_amount = db.Column(db.DECIMAL(10, 2), comment='该商品经过优惠后的分解金额')
+    coupon_amount = db.Column(db.DECIMAL(10, 2), comment='优惠券优惠分解金额')
+    promotion_amount = db.Column(db.DECIMAL(10, 2), comment='商品促销分解金额')
+    integration_amount = db.Column(db.DECIMAL(10, 2), comment='积分优惠分解金额')
+    gift_growth = db.Column(BIGINT(20, unsigned=True), comment='商品赠送成长值')
+    gift_integration = db.Column(BIGINT(20, unsigned=True), comment='商品赠送积分')
+
+    def __repr__(self):
+        return 'OrderItem 模型对象-> ID:{} 订单号:{} 用户id:{} 商品id:{} sku_id:{}'.format(
+            self.id, self.order_number, self.user_id, self.product_id, self.product_sku_id
+        )
