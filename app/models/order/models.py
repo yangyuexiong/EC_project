@@ -85,6 +85,7 @@ class OrderItem(BaseModel):
 class OrderSnapshot(BaseModel):
     __tablename__ = 'ec_order_snapshot'
     __table_args__ = {'comment': '订单快照表'}
+    caption = db.Column(db.String(128), comment='标题')
     user_id = db.Column(BIGINT(20, unsigned=True), comment='用户id')
     order_id = db.Column(BIGINT(20, unsigned=True), comment='订单id')
     order_number = db.Column(db.String(128), comment='订单号')
