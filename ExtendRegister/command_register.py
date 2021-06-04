@@ -14,7 +14,7 @@ from sqlalchemy import or_, and_
 from ExtendRegister.db_register import db
 from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, MidPermissionAndRole, ApiResource
 from app.models.product.models import Product, Sku
-from app.models.order.models import Order
+from app.models.order.models import Order, OrderItem
 
 
 # export FLASK_APP=ApplicationExample.py
@@ -472,3 +472,13 @@ def register_commands(app):
         db.session.add(new_order)
         db.session.commit()
         print('order_test -> 完成:{}'.format(order_number))
+
+        for i in range(0, 4):
+            new_order_item = OrderItem()
+            new_order_item.user_id = 0
+            new_order_item.order_id = new_order.id
+            new_order_item.order_number = order_number
+            new_order_item.product_quantity = 20 + i
+            db.session.add(new_order_item)
+            db.session.commit()
+        print('new_order_item -> 完成:{}'.format(order_number))
