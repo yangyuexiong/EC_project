@@ -9,4 +9,4 @@ from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, Mi
     RouteResource
 from app.models.product.models import ProductBrand, ProductCategory, Product, Sku, AttributeKey, AttributeVal, \
     ProductComment, ProductStock, ProductSales, ProductOperationLog
-from app.models.order.models import Order, OrderItem
+from app.models.order.models import Order, OrderItem, OrderSnapshot

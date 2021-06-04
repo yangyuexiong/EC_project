@@ -80,3 +80,17 @@ class OrderItem(BaseModel):
         return 'OrderItem 模型对象-> ID:{} 订单号:{} 用户id:{} 商品id:{} sku_id:{}'.format(
             self.id, self.order_number, self.user_id, self.product_id, self.product_sku_id
         )
+
+
+class OrderSnapshot(BaseModel):
+    __tablename__ = 'ec_order_snapshot'
+    __table_args__ = {'comment': '订单快照表'}
+    user_id = db.Column(BIGINT(20, unsigned=True), comment='用户id')
+    order_id = db.Column(BIGINT(20, unsigned=True), comment='订单id')
+    order_number = db.Column(db.String(128), comment='订单号')
+    order_info = db.Column(db.JSON, comment='订单信息json')
+
+    def __repr__(self):
+        return 'OrderSnapshot 模型对象-> ID:{} 订单id:{} 订单号:{} 用户id:{}'.format(
+            self.id, self.order_id, self.order_number, self.user_id
+        )
