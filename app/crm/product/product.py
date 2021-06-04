@@ -81,6 +81,7 @@ class ProductCrmApi(Resource):
                 cost_price = sku.get('cost_price')
                 sale_price = sku.get('sale_price')
                 sku_stock = sku.get('stock')
+                remark = sku.get('remark')
                 new_sku = Sku(
                     product_id=product_id,
                     icon=icon,
@@ -88,6 +89,9 @@ class ProductCrmApi(Resource):
                     price=price,
                     cost_price=cost_price,
                     sale_price=sale_price,
+                    creator=g.app_user.username,
+                    creator_id=g.app_user.id,
+                    remark=remark
                 )
                 db.session.add(new_sku)
                 db.session.commit()
