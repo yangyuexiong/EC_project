@@ -113,7 +113,7 @@ class Sku(BaseModel):
     __tablename__ = 'ec_sku'
     __table_args__ = {'comment': '商品规格'}
     product_id = db.Column(BIGINT(20, unsigned=True), nullable=False, comment='商品id')
-    icon = db.Column(db.String(255), comment='icon')
+    icon = db.Column(db.String(1024), comment='icon')
     spec = db.Column(db.JSON, comment='商品规格Json')
     price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='销售价')
     cost_price = db.Column(db.DECIMAL(10, 2), server_default=text('9999'), comment='成本价')

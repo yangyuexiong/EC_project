@@ -11,7 +11,7 @@ from common.libs.BaseModel import *
 class Order(BaseModel):
     __tablename__ = 'ec_order'
     __table_args__ = {'comment': '订单表'}
-    order_number = db.Column(db.String(128), comment='订单号')
+    order_number = db.Column(db.String(128), unique=True, comment='订单号')
     out_order_number = db.Column(db.String(128), comment='第三方订单号')
     user_id = db.Column(BIGINT(20, unsigned=True), comment='用户id')
     mobile = db.Column(db.String(64), comment='用户手机号')
@@ -52,7 +52,6 @@ class Order(BaseModel):
         return 'Order 模型对象-> ID:{} 订单号:{} 用户id:{}'.format(
             self.id, self.order_number, self.user_id
         )
-
 
 # class OrderItem(BaseModel):
 #     __tablename__ = 'ec_order_item'
