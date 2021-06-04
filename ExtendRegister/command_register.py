@@ -7,11 +7,14 @@
 
 import os
 import click
+from datetime import datetime
 
 from sqlalchemy import or_, and_
 
 from ExtendRegister.db_register import db
 from app.models.admin.models import Admin, Role, Permission, MidAdminAndRole, MidPermissionAndRole, ApiResource
+from app.models.product.models import Product, Sku
+from app.models.order.models import Order
 
 
 # export FLASK_APP=ApplicationExample.py
@@ -343,3 +346,129 @@ def register_commands(app):
                 db.session.add(mid_admin_role)
                 print('用户:{} 添加 角色:{} 完成'.format(root_admin.username, role.name))
         db.session.commit()
+
+    @app.cli.command("sku_test", help='测试创建商品sku')
+    def sku_test():
+        """测试创建商品sku"""
+        new_prod = Product(
+            # prod_category_id=prod_category,
+            name='iphone13',
+            summary='iphone13商品简介',
+            price='6999',
+            cost_price='1300',
+            sale_price='5999',
+            sale_status='1',
+            prod_status='1',
+            # cover_picture=cover_picture,
+            # video=video,
+            carousel={"url": "https://www.baidu.com/"},
+            image_link_dict={"url": "https://www.baidu.com/"},
+            creator='flask shell',
+            creator_id=0,
+            remark='remark'
+        )
+        db.session.add(new_prod)
+        db.session.commit()
+        print('new_prod -> 完成')
+
+        sku_list = [
+            {
+                "icon": "/img/1",
+                "spec": [
+                    {
+                        "key": "内存",
+                        "value": "128G"
+                    },
+                    {
+                        "key": "颜色",
+                        "value": "黑"
+                    }
+                ],
+                "price": "6399",
+                "cost_price": "1399",
+                "sale_price": "5999",
+                "stock": "777",
+                "remark": "remark-1"
+            },
+            {
+                "icon": "/img/2",
+                "spec": [
+                    {
+                        "key": "内存",
+                        "value": "128G"
+                    },
+                    {
+                        "key": "颜色",
+                        "value": "白"
+                    }
+                ],
+                "price": "6399",
+                "cost_price": "1399",
+                "sale_price": "5999",
+                "stock": "666",
+                "remark": "remark-2"
+            },
+            {
+                "icon": "/img/3",
+                "spec": [
+                    {
+                        "key": "内存",
+                        "value": "256G"
+                    },
+                    {
+                        "key": "颜色",
+                        "value": "黑"
+                    }
+                ],
+                "price": "7399",
+                "cost_price": "1699",
+                "sale_price": "6999",
+                "stock": "333",
+                "remark": "remark-3"
+            },
+            {
+                "icon": "/img/4",
+                "spec": [
+                    {
+                        "key": "内存",
+                        "value": "256G"
+                    },
+                    {
+                        "key": "颜色",
+                        "value": "白"
+                    }
+                ],
+                "price": "7399",
+                "cost_price": "1699",
+                "sale_price": "6999",
+                "stock": "333",
+                "remark": "remark-4"
+            }
+        ]
+        for sku in sku_list:
+            new_sku = Sku(
+                product_id=new_prod.id,
+                icon=sku.get('icon'),
+                spec=sku.get('spec'),
+                price=sku.get('price'),
+                cost_price=sku.get('cost_price'),
+                sale_price=sku.get('sale_price'),
+                creator='flask shell',
+                creator_id=0,
+                remark=sku.get('remark')
+            )
+            db.session.add(new_sku)
+        db.session.commit()
+        print('sku_list -> 完成')
+
+    @app.cli.command("order_test", help='测试创建订单')
+    def order_test():
+        """测试创建订单"""
+        from common.libs.utils import gen_order_number
+        new_order = Order()
+        order_number = gen_order_number()
+        new_order.order_number = order_number
+        new_order.payment_time = datetime.now()
+        db.session.add(new_order)
+        db.session.commit()
+        print('order_test -> 完成:{}'.format(order_number))
