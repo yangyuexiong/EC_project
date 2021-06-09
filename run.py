@@ -35,13 +35,6 @@ if __name__ == '__main__':
     # 设置环境
     export FLASK_ENV=development
     export FLASK_ENV=production
-    
-    export STARTUP_MODE=pyc
-    export STARTUP_MODE=ter
-    
-    # 调试
-    os.environ.get('FLASK_ENV')
-    os.environ.get('STARTUP_MODE')
     """
 
     flask_env = os.environ.get('FLASK_ENV')
